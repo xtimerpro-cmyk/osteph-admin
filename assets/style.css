@@ -721,15 +721,17 @@ html, body {
   align-items: center;
   gap: 6px;
 }
+
+/* Couleurs fixes champagne pour respecter l'identité O'Steph */
 .menu-btn {
   width: 26px;
   height: 26px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--silver-deep);
+  border: 1px solid #6b5e3e;
   background: transparent;
-  color: var(--silver);
+  color: #cfbb8f;
   font-family: 'Cinzel', serif;
   font-size: 16px;
   font-weight: 500;
@@ -740,61 +742,105 @@ html, body {
   user-select: none;
 }
 .menu-btn:hover {
-  background: var(--silver);
+  background: #cfbb8f;
   color: #0a0708;
-  border-color: var(--silver);
+  border-color: #cfbb8f;
   transform: scale(1.08);
 }
 .menu-btn:active { transform: scale(0.95); }
-.menu-btn.minus { color: #d49696; border-color: rgba(212,150,150,0.3); }
-.menu-btn.minus:hover { background: #6b1f1f; color: #fff; border-color: #6b1f1f; }
+
+/* Bouton − discret rouge */
+.menu-btn.minus {
+  color: #a87a7a;
+  border-color: rgba(168, 122, 122, 0.4);
+}
+.menu-btn.minus:hover {
+  background: #6b1f1f;
+  color: #fff;
+  border-color: #6b1f1f;
+}
+
+/* Bouton + plus visible (action principale) */
+.menu-btn.plus {
+  background: rgba(207, 187, 143, 0.15);
+  color: #ede0bf;
+  border-color: #cfbb8f;
+  font-size: 18px;
+  font-weight: 600;
+}
+.menu-btn.plus:hover {
+  background: #cfbb8f;
+  color: #0a0708;
+  box-shadow: 0 0 14px rgba(207,187,143,0.4);
+}
+
+/* Compteur */
 .menus-count {
   font-family: 'Cinzel', serif;
   font-weight: 600;
   font-size: 16px;
   min-width: 28px;
   text-align: center;
-  color: var(--silver-bright);
+  color: #ede0bf;
   letter-spacing: 0.05em;
   font-variant-numeric: tabular-nums;
 }
 .menus-count.reward-due {
   color: #ede0bf;
-  text-shadow: 0 0 12px rgba(207,187,143,0.6);
+  text-shadow: 0 0 12px rgba(207,187,143,0.8);
   animation: rewardPulse 2s ease-in-out infinite;
 }
 @keyframes rewardPulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  50% { opacity: 0.6; }
 }
 
-@media (max-width: 600px) {
-  .menu-btn { width: 22px; height: 22px; font-size: 14px; }
-  .menus-count { font-size: 14px; min-width: 22px; }
+/* ===== Bouton SAVE (champagne, action explicite) ===== */
+.save-btn {
+  margin-left: 8px;
+  padding: 5px 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: transparent;
+  color: #6b5e3e;
+  border: 1px solid #6b5e3e;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
-
-/* ===== Bouton + plus gros que le - (action principale) ===== */
-.menu-btn.plus {
-  background: rgba(207, 187, 143, 0.15);
-  color: var(--silver-bright);
-  border-color: var(--silver);
-  font-size: 18px;
-  font-weight: 600;
+.save-btn:hover {
+  color: #cfbb8f;
+  border-color: #cfbb8f;
 }
-.menu-btn.plus:hover {
-  background: var(--silver);
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* Quand la ligne a des modifs non sauvées, le bouton Save passe en mode actif */
+.save-btn.dirty {
+  background: #cfbb8f;
   color: #0a0708;
-  box-shadow: 0 0 14px rgba(207,187,143,0.4);
+  border-color: #cfbb8f;
+  font-weight: 600;
+  animation: savePulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(207,187,143,0.4);
+}
+@keyframes savePulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(207,187,143,0.4); }
+  50% { box-shadow: 0 0 20px rgba(207,187,143,0.7); }
 }
 
-/* ===== Animation pulse sur compteur après clic ===== */
+/* Animation pulse compteur */
 .menus-count.pulse {
   animation: countPulse 0.4s ease-out;
 }
 @keyframes countPulse {
   0% { transform: scale(1); }
-  40% { transform: scale(1.25); color: var(--silver-bright); }
-  100% { transform: scale(1); }
+  40% { transform: scale(1.25); color: #ffffff; }
+  100% { transform: scale(1); color: #ede0bf; }
 }
 
 /* ===== États de sauvegarde sur la cellule ===== */
@@ -802,57 +848,63 @@ html, body {
   position: relative;
   transition: background 0.3s ease;
   border-radius: 4px;
-  padding: 4px 6px !important;
+}
+/* Indicateur visuel "ligne modifiée non sauvée" */
+.menus-cell.dirty {
+  background: rgba(207, 187, 143, 0.05);
 }
 .menus-cell.saving {
-  background: rgba(207, 187, 143, 0.08);
+  background: rgba(207, 187, 143, 0.12);
 }
 .menus-cell.saving::after {
   content: '⟳';
   position: absolute;
-  right: 8px;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--silver-soft);
+  color: #cfbb8f;
   animation: spin 1s linear infinite;
-  font-size: 12px;
+  font-size: 14px;
 }
 .menus-cell.saved {
-  background: rgba(126, 199, 126, 0.12);
+  background: rgba(126, 199, 126, 0.15);
 }
 .menus-cell.saved::after {
   content: '✓';
   position: absolute;
-  right: 8px;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%);
   color: #7ec77e;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
-  animation: fadeOut 1.5s ease-out forwards;
+  animation: fadeOut 1.8s ease-out forwards;
+}
+.menus-cell.saved-local {
+  background: rgba(207, 187, 143, 0.1);
 }
 .menus-cell.saved-local::after {
   content: '✓ local';
   position: absolute;
-  right: 6px;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--silver-soft);
-  font-size: 9px;
+  color: #cfbb8f;
+  font-size: 10px;
   letter-spacing: 0.1em;
-  animation: fadeOut 1.5s ease-out forwards;
+  animation: fadeOut 1.8s ease-out forwards;
 }
 .menus-cell.save-error {
-  background: rgba(199, 85, 85, 0.15);
+  background: rgba(199, 85, 85, 0.18);
 }
 .menus-cell.save-error::after {
   content: '⚠';
   position: absolute;
-  right: 8px;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%);
   color: #c75555;
-  font-size: 14px;
+  font-size: 16px;
   animation: fadeOut 2.5s ease-out forwards;
 }
 
@@ -864,4 +916,10 @@ html, body {
   0% { opacity: 1; }
   60% { opacity: 1; }
   100% { opacity: 0; }
+}
+
+@media (max-width: 600px) {
+  .menu-btn { width: 22px; height: 22px; font-size: 14px; }
+  .menus-count { font-size: 14px; min-width: 22px; }
+  .save-btn { padding: 4px 9px; font-size: 9px; letter-spacing: 0.14em; }
 }
