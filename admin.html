@@ -66,6 +66,8 @@
     <span class="admin-stat">Total clients : <strong id="stat-total">0</strong></span>
     <span class="admin-stat">Aujourd'hui : <strong id="stat-today">0</strong></span>
     <span class="admin-stat">Ce mois : <strong id="stat-month">0</strong></span>
+    <span class="admin-stat">Menus servis : <strong id="stat-menus">0</strong></span>
+    <span class="admin-stat">Récompenses dues : <strong id="stat-rewards">0</strong></span>
   </div>
 
   <!-- Toolbar -->
@@ -106,6 +108,7 @@
           <th>Nom</th>
           <th class="hide-sm">Email</th>
           <th>Tél.</th>
+          <th>Menus</th>
           <th class="hide-sm">Inscrit le</th>
           <th></th>
         </tr>
@@ -215,12 +218,26 @@ function refresh() {
       const sourceBadge = c.source === 'qr'
         ? '<span style="font-size:9px; padding:2px 6px; background:rgba(255,255,255,0.08); border:1px solid var(--silver-deep); border-radius:8px; letter-spacing:0.1em; vertical-align:middle; margin-left:6px; color:var(--silver-soft);">QR</span>'
         : '';
+      const menus = parseInt(c.menus || 0, 10);
+      // Récompense due tous les 10 menus
+      const rewardDue = menus > 0 && menus % 10 === 0;
+      const rewardBadge = rewardDue
+        ? '<span title="Récompense disponible !" style="margin-left:6px; font-size:14px;">🎁</span>'
+        : '';
       tr.innerHTML = `
         <td class="num">${c.number}${sourceBadge}</td>
         <td>${dash(c.prenom)}</td>
         <td>${dash(c.nom)}</td>
         <td class="hide-sm">${dash(c.email)}</td>
         <td>${dash(c.telephone)}</td>
+        <td class="menus-cell">
+          <div class="menus-control">
+            <button class="menu-btn minus" data-num="${c.number}" data-action="dec" title="Retirer 1 menu">−</button>
+            <span class="menus-count ${rewardDue ? 'reward-due' : ''}">${menus}</span>
+            <button class="menu-btn plus" data-num="${c.number}" data-action="inc" title="Ajouter 1 menu">+</button>
+            ${rewardBadge}
+          </div>
+        </td>
         <td class="hide-sm">${dateStr}</td>
         <td><button class="del-btn" data-num="${c.number}">Supprimer</button></td>
       `;
@@ -236,6 +253,44 @@ function refresh() {
     all.filter(c => new Date(c.created).toDateString() === today).length;
   document.getElementById('stat-month').textContent =
     all.filter(c => c.created.slice(0,7) === thisMonth).length;
+
+  // Stats menus
+  const totalMenus = all.reduce((sum, c) => sum + parseInt(c.menus || 0, 10), 0);
+  const rewardsDue = all.filter(c => {
+    const m = parseInt(c.menus || 0, 10);
+    return m > 0 && m % 10 === 0;
+  }).length;
+  document.getElementById('stat-menus').textContent = totalMenus;
+  document.getElementById('stat-rewards').textContent = rewardsDue;
+
+  // Bind +/- menus
+  tbody.querySelectorAll('.menu-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const num = btn.dataset.num;
+      const action = btn.dataset.action;
+      const all = OSTEPH.loadClients();
+      const idx = all.findIndex(c => c.number === num);
+      if (idx === -1) return;
+
+      const current = parseInt(all[idx].menus || 0, 10);
+      const next = action === 'inc' ? current + 1 : Math.max(0, current - 1);
+      all[idx].menus = next;
+      // Trace dernière action (utile pour stats futures)
+      all[idx].last_visit = new Date().toISOString();
+      OSTEPH.saveClients(all);
+      refresh();
+
+      // Push cloud silencieux (pas d'alerte)
+      if (OSTEPH.isCloudConfigured()) {
+        try {
+          await OSTEPH.cloudPush(all);
+          setSyncStatus(`✓ Menus ${num} : ${next} · ` + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}));
+        } catch (err) {
+          setSyncStatus('⚠ Sync KO — vérifie connexion');
+        }
+      }
+    });
+  });
 
   // Bind suppression
   tbody.querySelectorAll('.del-btn').forEach(btn => {

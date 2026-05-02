@@ -126,9 +126,9 @@ const OSTEPH = {
   // ===== Export CSV =====
   exportCSV() {
     const clients = this.loadClients();
-    const headers = ['Numéro', 'Prénom', 'Nom', 'Email', 'Téléphone', 'Inscription'];
+    const headers = ['Numéro', 'Prénom', 'Nom', 'Email', 'Téléphone', 'Menus', 'Inscription'];
     const rows = clients.map(c => [
-      c.number, c.prenom, c.nom, c.email, c.telephone,
+      c.number, c.prenom, c.nom, c.email, c.telephone, c.menus || 0,
       new Date(c.created).toLocaleString('fr-FR')
     ]);
     const csv = [headers, ...rows]
