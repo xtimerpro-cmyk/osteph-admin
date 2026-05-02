@@ -246,26 +246,39 @@ function refresh() {
   }
 
   // Stats
-  document.getElementById('stat-total').textContent = all.length;
-  const today = new Date().toDateString();
-  const thisMonth = new Date().toISOString().slice(0,7);
-  document.getElementById('stat-today').textContent =
-    all.filter(c => new Date(c.created).toDateString() === today).length;
-  document.getElementById('stat-month').textContent =
-    all.filter(c => c.created.slice(0,7) === thisMonth).length;
+  updateStatsOnly(all);
 
-  // Stats menus
-  const totalMenus = all.reduce((sum, c) => sum + parseInt(c.menus || 0, 10), 0);
-  const rewardsDue = all.filter(c => {
-    const m = parseInt(c.menus || 0, 10);
-    return m > 0 && m % 10 === 0;
-  }).length;
-  document.getElementById('stat-menus').textContent = totalMenus;
-  document.getElementById('stat-rewards').textContent = rewardsDue;
+  // ===== Bind +/- menus avec debounce et feedback visuel =====
+  // On regroupe les clics rapides (genre +5 d'un coup) en un seul push cloud
+  const pendingPushes = {};
+  function scheduleCloudPush(num, cell) {
+    clearTimeout(pendingPushes[num]);
+    pendingPushes[num] = setTimeout(async () => {
+      delete pendingPushes[num];
+      if (!OSTEPH.isCloudConfigured()) {
+        cell.classList.add('saved-local');
+        setTimeout(() => cell.classList.remove('saved-local'), 1500);
+        return;
+      }
+      cell.classList.add('saving');
+      try {
+        await OSTEPH.cloudPush(OSTEPH.loadClients());
+        cell.classList.remove('saving');
+        cell.classList.add('saved');
+        setTimeout(() => cell.classList.remove('saved'), 1500);
+        const time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+        setSyncStatus(`✓ Sauvegardé dans le cloud · ${time}`);
+      } catch (err) {
+        cell.classList.remove('saving');
+        cell.classList.add('save-error');
+        setTimeout(() => cell.classList.remove('save-error'), 2500);
+        setSyncStatus('⚠ Erreur sync — réessayez');
+      }
+    }, 700); // 700ms après le dernier clic on push
+  }
 
-  // Bind +/- menus
   tbody.querySelectorAll('.menu-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', () => {
       const num = btn.dataset.num;
       const action = btn.dataset.action;
       const all = OSTEPH.loadClients();
@@ -275,20 +288,28 @@ function refresh() {
       const current = parseInt(all[idx].menus || 0, 10);
       const next = action === 'inc' ? current + 1 : Math.max(0, current - 1);
       all[idx].menus = next;
-      // Trace dernière action (utile pour stats futures)
       all[idx].last_visit = new Date().toISOString();
       OSTEPH.saveClients(all);
-      refresh();
 
-      // Push cloud silencieux (pas d'alerte)
-      if (OSTEPH.isCloudConfigured()) {
-        try {
-          await OSTEPH.cloudPush(all);
-          setSyncStatus(`✓ Menus ${num} : ${next} · ` + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}));
-        } catch (err) {
-          setSyncStatus('⚠ Sync KO — vérifie connexion');
-        }
+      // Mise à jour immédiate du compteur sans full refresh (perf + pas de flicker)
+      const tr = btn.closest('tr');
+      const countEl = tr.querySelector('.menus-count');
+      const cell = tr.querySelector('.menus-cell');
+      if (countEl) {
+        countEl.textContent = next;
+        // Toggle reward state
+        const rewardDue = next > 0 && next % 10 === 0;
+        countEl.classList.toggle('reward-due', rewardDue);
+        // Animation pulse au clic
+        countEl.classList.remove('pulse');
+        void countEl.offsetWidth; // reflow pour relancer l'anim
+        countEl.classList.add('pulse');
       }
+      // Refresh stats globales (sans toucher au DOM des lignes)
+      updateStatsOnly(all);
+
+      // Schedule cloud push (debounced)
+      scheduleCloudPush(num, cell);
     });
   });
 
@@ -314,6 +335,23 @@ function refresh() {
       }
     });
   });
+}
+
+function updateStatsOnly(all) {
+  document.getElementById('stat-total').textContent = all.length;
+  const today = new Date().toDateString();
+  const thisMonth = new Date().toISOString().slice(0,7);
+  document.getElementById('stat-today').textContent =
+    all.filter(c => new Date(c.created).toDateString() === today).length;
+  document.getElementById('stat-month').textContent =
+    all.filter(c => c.created.slice(0,7) === thisMonth).length;
+  const totalMenus = all.reduce((sum, c) => sum + parseInt(c.menus || 0, 10), 0);
+  const rewardsDue = all.filter(c => {
+    const m = parseInt(c.menus || 0, 10);
+    return m > 0 && m % 10 === 0;
+  }).length;
+  document.getElementById('stat-menus').textContent = totalMenus;
+  document.getElementById('stat-rewards').textContent = rewardsDue;
 }
 
 function escapeHtml(s) {

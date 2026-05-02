@@ -772,3 +772,96 @@ html, body {
   .menu-btn { width: 22px; height: 22px; font-size: 14px; }
   .menus-count { font-size: 14px; min-width: 22px; }
 }
+
+/* ===== Bouton + plus gros que le - (action principale) ===== */
+.menu-btn.plus {
+  background: rgba(207, 187, 143, 0.15);
+  color: var(--silver-bright);
+  border-color: var(--silver);
+  font-size: 18px;
+  font-weight: 600;
+}
+.menu-btn.plus:hover {
+  background: var(--silver);
+  color: #0a0708;
+  box-shadow: 0 0 14px rgba(207,187,143,0.4);
+}
+
+/* ===== Animation pulse sur compteur après clic ===== */
+.menus-count.pulse {
+  animation: countPulse 0.4s ease-out;
+}
+@keyframes countPulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); color: var(--silver-bright); }
+  100% { transform: scale(1); }
+}
+
+/* ===== États de sauvegarde sur la cellule ===== */
+.menus-cell {
+  position: relative;
+  transition: background 0.3s ease;
+  border-radius: 4px;
+  padding: 4px 6px !important;
+}
+.menus-cell.saving {
+  background: rgba(207, 187, 143, 0.08);
+}
+.menus-cell.saving::after {
+  content: '⟳';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--silver-soft);
+  animation: spin 1s linear infinite;
+  font-size: 12px;
+}
+.menus-cell.saved {
+  background: rgba(126, 199, 126, 0.12);
+}
+.menus-cell.saved::after {
+  content: '✓';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7ec77e;
+  font-size: 14px;
+  font-weight: bold;
+  animation: fadeOut 1.5s ease-out forwards;
+}
+.menus-cell.saved-local::after {
+  content: '✓ local';
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--silver-soft);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  animation: fadeOut 1.5s ease-out forwards;
+}
+.menus-cell.save-error {
+  background: rgba(199, 85, 85, 0.15);
+}
+.menus-cell.save-error::after {
+  content: '⚠';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c75555;
+  font-size: 14px;
+  animation: fadeOut 2.5s ease-out forwards;
+}
+
+@keyframes spin {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  60% { opacity: 1; }
+  100% { opacity: 0; }
+}
