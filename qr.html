@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<title>Mode QR — O'Steph</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/logo.png" type="image/png">
+<script>(function(){try{var t=localStorage.getItem("osteph_theme_v1")||"gold";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+  /* Kiosque plein écran */
+  body { overflow: hidden; }
+  .kiosk {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .kiosk-logo {
+    max-width: 160px;
+    width: 35%;
+    margin-bottom: 18px;
+    filter: drop-shadow(0 0 16px rgba(255,255,255,0.15));
+  }
+  [data-theme="light"] .kiosk-logo { filter: invert(1) drop-shadow(0 0 12px rgba(0,0,0,0.15)); }
+  .kiosk-tagline {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.4em;
+    color: var(--silver);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .qr-frame {
+    padding: 18px;
+    background: var(--white);
+    border: 2px solid var(--silver);
+    border-radius: 6px;
+    box-shadow: 0 0 60px rgba(255,255,255,0.18);
+    transition: transform 0.2s ease;
+  }
+  [data-theme="light"] .qr-frame { box-shadow: 0 0 30px rgba(0,0,0,0.15); }
+  .kiosk:hover .qr-frame { transform: scale(1.02); }
+  .qr-frame img {
+    display: block;
+    width: 280px;
+    height: 280px;
+  }
+  .kiosk-instr {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    text-transform: uppercase;
+    margin-top: 24px;
+    text-align: center;
+  }
+  .kiosk-num {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--silver-soft);
+    margin-top: 12px;
+    opacity: 0.7;
+  }
+  .kiosk-hint {
+    position: fixed;
+    bottom: 14px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--silver-deep);
+    text-transform: uppercase;
+  }
+  @media (max-width: 480px) {
+    .qr-frame img { width: 230px; height: 230px; }
+    .kiosk-tagline { font-size: 11px; letter-spacing: 0.3em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="theme-switcher" role="group" aria-label="Thème">
+  <button data-theme="bw" title="Noir & Blanc"></button>
+  <button data-theme="gold" title="Doré chic"></button>
+  <button data-theme="light" title="Clair"></button>
+</div>
+
+<div class="sparkle-layer"></div>
+
+<div class="kiosk" id="kiosk" role="button" aria-label="Tap pour générer un nouveau QR">
+  <img src="assets/logo.png" alt="O'Steph" class="kiosk-logo">
+  <div class="kiosk-tagline">Carte de Fidélité</div>
+
+  <div class="qr-frame">
+    <img id="qr-img" alt="QR de fidélité">
+  </div>
+
+  <div class="kiosk-instr">Scannez pour votre numéro client à vie</div>
+  <div class="kiosk-num" id="num-display">—</div>
+
+  <div class="kiosk-hint">▸ Tap pour le client suivant</div>
+
+  <div id="config-warn" style="display:none; position:fixed; top:14px; left:14px; max-width:300px; padding:10px 14px; background:rgba(120,30,30,0.85); border:1px solid #c75555; border-radius:4px; color:#fff; font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.1em; line-height:1.5;">
+    ⚠ JSONBin non configuré · Le tel des clients<br>
+    ne sera pas enregistré. Va dans <a href="admin.html" style="color:#fff; text-decoration:underline;">Back office</a> → ⚙ Config.
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+// ⚠ URL DU SITE PUBLIC (à changer après déploiement)
+// En attendant ton domaine perso, ça pointe sur GitHub Pages.
+const PUBLIC_SITE_URL = localStorage.getItem('osteph_public_url') || 'https://xtimerpro-cmyk.github.io/osteph';
+
+function nextNumber() {
+  const year = new Date().getFullYear();
+  const counter = parseInt(localStorage.getItem('osteph_counter_v1') || '0', 10) + 1;
+  localStorage.setItem('osteph_counter_v1', String(counter));
+  return `OS-${year}-${String(counter).padStart(5, '0')}`;
+}
+
+function generateQR() {
+  const number = nextNumber();
+  const cfg = OSTEPH.cloudConfig();
+
+  // Le QR pointe vers le SITE PUBLIC où le client va saisir ses infos
+  let target = PUBLIC_SITE_URL.replace(/\/$/, '') + '/numero.html?n=' + encodeURIComponent(number);
+  if (cfg.id && cfg.key) {
+    target += '&b=' + encodeURIComponent(cfg.id);
+    target += '&k=' + encodeURIComponent(cfg.key);
+  }
+
+  const qr = qrcode(0, 'M');
+  qr.addData(target);
+  qr.make();
+  document.getElementById('qr-img').src = qr.createDataURL(8, 2);
+  document.getElementById('num-display').textContent = number;
+
+  const warn = document.getElementById('config-warn');
+  if (warn) warn.style.display = OSTEPH.isCloudConfigured() ? 'none' : 'block';
+}
+
+generateQR();
+
+document.getElementById('kiosk').addEventListener('click', e => {
+  if (e.target.closest('.theme-switcher')) return;
+  if (e.target.closest('#config-warn')) return;
+  generateQR();
+});
+</script>
+</body>
+</html>
