@@ -26,15 +26,20 @@ const OSTEPH = {
   },
 
   // ===== Configuration JSONBin =====
-  // Priorité : URL params (téléphone client) > localStorage (admin Karim)
+  // Credentials embarqués pour que TOUS les visiteurs (depuis n'importe quel
+  // appareil) puissent inscrire les fidèles dans le même cloud.
+  // Override possible via URL params (?b=...&k=...) ou localStorage admin.
+  DEFAULT_BIN_ID: '6a003b66250b1311c32bba97',
+  DEFAULT_MASTER_KEY: '$2a$10$Scw0xyvThlXOPIFme7sN7eIoiui5TrbwqiC/uRoeWcbauIVziR2PK',
+
   cloudConfig() {
     const u = new URLSearchParams(location.search);
     const idFromUrl = u.get('b');
     const keyFromUrl = u.get('k');
     if (idFromUrl && keyFromUrl) return { id: idFromUrl, key: keyFromUrl };
     return {
-      id: localStorage.getItem(this.KEY_BIN_ID) || '',
-      key: localStorage.getItem(this.KEY_BIN_KEY) || ''
+      id: localStorage.getItem(this.KEY_BIN_ID) || this.DEFAULT_BIN_ID,
+      key: localStorage.getItem(this.KEY_BIN_KEY) || this.DEFAULT_MASTER_KEY
     };
   },
   setCloudConfig(id, key) {
