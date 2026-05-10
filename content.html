@@ -238,9 +238,8 @@
 
 <script src="assets/app.js"></script>
 <script>
-  // ===== Auth check =====
-  if (sessionStorage.getItem('osteph_admin_auth') !== 'ok'
-      && localStorage.getItem('osteph_admin_auth') !== 'ok') {
+  // ===== Auth check (même clé que admin.html) =====
+  if (sessionStorage.getItem(OSTEPH.KEY_ADMIN_AUTH) !== '1') {
     location.href = 'admin.html';
   }
 
