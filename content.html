@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="gold">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>O'Steph — Édition Contenu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  /* ==== Header ==== */
+  .content-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 28px; border-bottom: 1px solid rgba(207,187,143,0.2);
+    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+  }
+  .content-header h1 {
+    font-family: 'Cinzel', serif; font-size: 22px; letter-spacing: 0.18em;
+    color: #ede0bf; margin: 0; text-transform: uppercase; font-weight: 500;
+  }
+  .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-mini {
+    padding: 9px 16px; font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 0.15em; text-transform: uppercase; background: transparent;
+    color: #cfbb8f; border: 1px solid rgba(207,187,143,0.4); border-radius: 3px;
+    cursor: pointer; text-decoration: none; transition: all 0.2s;
+  }
+  .btn-mini:hover { background: rgba(207,187,143,0.1); border-color: #cfbb8f; }
+  .btn-mini.primary { background: #cfbb8f; color: #000; border-color: #cfbb8f; }
+  .btn-mini.primary:hover { background: #ede0bf; }
+  .btn-mini.danger { color: #c87575; border-color: rgba(200,117,117,0.4); }
+  .btn-mini.danger:hover { background: rgba(200,117,117,0.1); }
+
+  /* ==== Tabs ==== */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid rgba(207,187,143,0.15); margin: 0 28px 20px; flex-wrap: wrap; }
+  .tab {
+    padding: 12px 22px; font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 0.18em; text-transform: uppercase; background: transparent;
+    color: rgba(207,187,143,0.55); border: none; border-bottom: 2px solid transparent;
+    cursor: pointer; transition: all 0.2s; margin-bottom: -1px;
+  }
+  .tab:hover { color: #cfbb8f; }
+  .tab.active { color: #ede0bf; border-bottom-color: #cfbb8f; }
+
+  /* ==== Cloud status banner ==== */
+  .cloud-status {
+    margin: 0 28px 18px; padding: 10px 14px; border-radius: 4px;
+    font-family: 'Cormorant Garamond', serif; font-size: 14px;
+    background: rgba(207,187,143,0.06); border: 1px solid rgba(207,187,143,0.18);
+    color: #cfbb8f; display: none;
+  }
+  .cloud-status.show { display: block; }
+  .cloud-status.ok { color: #8fcfa1; border-color: rgba(143,207,161,0.3); background: rgba(143,207,161,0.05); }
+  .cloud-status.err { color: #d88; border-color: rgba(216,136,136,0.3); background: rgba(216,136,136,0.05); }
+
+  /* ==== Section panels ==== */
+  .panel { padding: 0 28px 30px; display: none; }
+  .panel.active { display: block; }
+  .panel-intro {
+    font-family: 'Cormorant Garamond', serif; font-size: 15px;
+    color: rgba(237,224,191,0.7); margin-bottom: 18px; line-height: 1.6;
+  }
+
+  /* ==== Cities editor ==== */
+  .cities-list { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
+  .city-row {
+    display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+    background: rgba(207,187,143,0.04); border: 1px solid rgba(207,187,143,0.18);
+    border-radius: 4px;
+  }
+  .city-input {
+    flex: 1; padding: 9px 12px; background: transparent; color: #ede0bf;
+    border: 1px solid rgba(207,187,143,0.25); border-radius: 3px;
+    font-family: 'Cormorant Garamond', serif; font-size: 16px;
+  }
+  .city-input:focus { outline: none; border-color: #cfbb8f; }
+  .reorder-btn, .remove-btn {
+    width: 36px; height: 36px; padding: 0; background: transparent;
+    color: #cfbb8f; border: 1px solid rgba(207,187,143,0.25); border-radius: 3px;
+    cursor: pointer; font-size: 16px; transition: all 0.2s; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .reorder-btn:hover { background: rgba(207,187,143,0.1); }
+  .remove-btn { color: #c87575; border-color: rgba(200,117,117,0.3); }
+  .remove-btn:hover { background: rgba(200,117,117,0.1); }
+  .add-row {
+    margin-top: 4px; padding: 12px; text-align: center;
+    background: rgba(207,187,143,0.03); border: 1px dashed rgba(207,187,143,0.25);
+    border-radius: 4px; color: #cfbb8f; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; transition: all 0.2s;
+  }
+  .add-row:hover { background: rgba(207,187,143,0.08); border-style: solid; }
+
+  /* ==== Menu editor ==== */
+  .menu-section {
+    background: rgba(207,187,143,0.03); border: 1px solid rgba(207,187,143,0.18);
+    border-radius: 4px; padding: 18px; margin-bottom: 16px;
+  }
+  .menu-section-header {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 12px; padding-bottom: 12px;
+    border-bottom: 1px solid rgba(207,187,143,0.12);
+  }
+  .menu-section-title-input {
+    flex: 1; min-width: 200px; padding: 10px 14px; background: transparent;
+    color: #ede0bf; border: 1px solid rgba(207,187,143,0.25); border-radius: 3px;
+    font-family: 'Cinzel', serif; font-size: 15px; letter-spacing: 0.1em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  .menu-section-subtitle-input {
+    width: 100%; margin-top: 8px; padding: 8px 12px; background: transparent;
+    color: rgba(237,224,191,0.85); border: 1px solid rgba(207,187,143,0.18);
+    border-radius: 3px; font-family: 'Cormorant Garamond', serif; font-size: 14px;
+    font-style: italic;
+  }
+  .menu-section-title-input:focus,
+  .menu-section-subtitle-input:focus,
+  .item-input { outline: none; border-color: #cfbb8f; }
+
+  .menu-items { display: flex; flex-direction: column; gap: 8px; }
+  .menu-item-row {
+    display: grid;
+    grid-template-columns: 30px minmax(160px, 1.2fr) 110px minmax(180px, 2fr) 36px 36px 36px;
+    gap: 8px; align-items: start;
+    padding: 8px; background: rgba(0,0,0,0.25); border-radius: 3px;
+  }
+  .item-handle {
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(207,187,143,0.4); font-size: 14px; padding-top: 8px;
+  }
+  .item-input {
+    padding: 8px 10px; background: transparent; color: #ede0bf;
+    border: 1px solid rgba(207,187,143,0.18); border-radius: 3px;
+    font-family: 'Cormorant Garamond', serif; font-size: 14px;
+  }
+  .item-desc { font-style: italic; }
+
+  .section-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+
+  .add-section {
+    margin: 18px 0 0; padding: 18px; text-align: center;
+    background: rgba(207,187,143,0.04); border: 1px dashed rgba(207,187,143,0.3);
+    border-radius: 4px; color: #cfbb8f; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.18em;
+    text-transform: uppercase; transition: all 0.2s; width: 100%; display: block;
+  }
+  .add-section:hover { background: rgba(207,187,143,0.1); }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .content-header { padding: 14px 16px; }
+    .tabs { margin: 0 16px 16px; }
+    .panel { padding: 0 16px 30px; }
+    .menu-item-row {
+      grid-template-columns: 1fr;
+      gap: 6px; padding: 12px;
+    }
+    .item-handle { display: none; }
+    .menu-section { padding: 12px; }
+  }
+
+  /* Save button sticky en bas */
+  .save-bar {
+    position: sticky; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.85));
+    padding: 14px 28px; border-top: 1px solid rgba(207,187,143,0.2);
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 16px; backdrop-filter: blur(8px); flex-wrap: wrap; gap: 10px;
+  }
+  .save-status {
+    font-family: 'Cormorant Garamond', serif; font-style: italic; color: rgba(237,224,191,0.7);
+  }
+  .save-status.dirty { color: #ede0bf; }
+  .save-status.saving { color: #cfbb8f; }
+  .save-status.saved { color: #8fcfa1; }
+  .save-status.err { color: #d88; }
+  .btn-save {
+    padding: 12px 28px; font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 0.18em; text-transform: uppercase; background: #cfbb8f;
+    color: #000; border: none; border-radius: 3px; cursor: pointer; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-save:hover { background: #ede0bf; }
+  .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-save.dirty { animation: dirtyPulse 1.5s ease-in-out infinite; }
+  @keyframes dirtyPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(207,187,143,0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(207,187,143,0); }
+  }
+</style>
+</head>
+<body>
+<div class="sparkle-layer"></div>
+
+<div class="frame">
+  <header class="content-header">
+    <h1>Édition du contenu</h1>
+    <div class="header-actions">
+      <a href="admin.html" class="btn-mini">← Back office</a>
+      <button class="btn-mini" id="reload-btn">⟳ Recharger depuis cloud</button>
+    </div>
+  </header>
+
+  <div id="cloud-status" class="cloud-status"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="cities">Villes (ticker défilant)</button>
+    <button class="tab" data-tab="menu">Menu (sandwichs & boissons)</button>
+  </div>
+
+  <!-- ==== TAB VILLES ==== -->
+  <section class="panel active" id="panel-cities">
+    <p class="panel-intro">
+      Les villes apparaissent dans le bandeau défilant en haut de la page d'accueil et de la page menu.
+      Modifie, ajoute, supprime ou réordonne avec les boutons. <strong>Pense à enregistrer en bas.</strong>
+    </p>
+    <div class="cities-list" id="cities-list"></div>
+    <button class="add-row" id="add-city">+ Ajouter une ville</button>
+  </section>
+
+  <!-- ==== TAB MENU ==== -->
+  <section class="panel" id="panel-menu">
+    <p class="panel-intro">
+      Édite le menu complet : sections (Shawarma, Gyros, etc.), items (nom + prix + description).
+      Tu peux ajouter ou supprimer des lignes ou des sections entières. <strong>Pense à enregistrer en bas.</strong>
+    </p>
+    <div id="menu-list"></div>
+    <button class="add-section" id="add-section">+ Ajouter une section</button>
+  </section>
+
+  <!-- ==== Save bar ==== -->
+  <div class="save-bar">
+    <span class="save-status" id="save-status">Aucune modification</span>
+    <button class="btn-save" id="save-btn" disabled>💾 Enregistrer dans le cloud</button>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+  // ===== Auth check =====
+  if (sessionStorage.getItem('osteph_admin_auth') !== 'ok'
+      && localStorage.getItem('osteph_admin_auth') !== 'ok') {
+    location.href = 'admin.html';
+  }
+
+  let content = { cities: [], menu: [] };
+  let dirty = false;
+
+  // ===== UI helpers =====
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => document.querySelectorAll(sel);
+
+  function showStatus(msg, type) {
+    const el = $('#cloud-status');
+    el.textContent = msg;
+    el.className = 'cloud-status show ' + (type || '');
+    if (type === 'ok') setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  function setDirty(d) {
+    dirty = d;
+    const ss = $('#save-status');
+    const sb = $('#save-btn');
+    if (d) {
+      ss.textContent = '● Modifications non enregistrées';
+      ss.className = 'save-status dirty';
+      sb.disabled = false;
+      sb.classList.add('dirty');
+    } else {
+      ss.textContent = 'Aucune modification';
+      ss.className = 'save-status';
+      sb.disabled = true;
+      sb.classList.remove('dirty');
+    }
+  }
+
+  // ===== Tabs =====
+  $$('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.tab').forEach(b => b.classList.remove('active'));
+      $$('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      $('#panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ===== CITIES rendering =====
+  function renderCities() {
+    const list = $('#cities-list');
+    list.innerHTML = '';
+    content.cities.forEach((city, i) => {
+      const row = document.createElement('div');
+      row.className = 'city-row';
+      row.innerHTML = `
+        <button class="reorder-btn" title="Monter" ${i === 0 ? 'disabled style="opacity:0.3"' : ''}>↑</button>
+        <button class="reorder-btn" title="Descendre" ${i === content.cities.length - 1 ? 'disabled style="opacity:0.3"' : ''}>↓</button>
+        <input class="city-input" type="text" value="${escapeHtml(city)}" placeholder="Nom de la ville">
+        <button class="remove-btn" title="Supprimer">×</button>
+      `;
+      const [up, down, input, rm] = row.children;
+      up.onclick = () => { if (i > 0) { [content.cities[i-1], content.cities[i]] = [content.cities[i], content.cities[i-1]]; setDirty(true); renderCities(); } };
+      down.onclick = () => { if (i < content.cities.length - 1) { [content.cities[i+1], content.cities[i]] = [content.cities[i], content.cities[i+1]]; setDirty(true); renderCities(); } };
+      input.oninput = () => { content.cities[i] = input.value; setDirty(true); };
+      rm.onclick = () => { if (confirm('Supprimer "' + city + '" ?')) { content.cities.splice(i, 1); setDirty(true); renderCities(); } };
+      list.appendChild(row);
+    });
+  }
+
+  $('#add-city').addEventListener('click', () => {
+    content.cities.push('');
+    setDirty(true);
+    renderCities();
+    // focus sur le nouveau champ
+    const inputs = $$('.city-input');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  });
+
+  // ===== MENU rendering =====
+  function renderMenu() {
+    const list = $('#menu-list');
+    list.innerHTML = '';
+    content.menu.forEach((section, sIdx) => {
+      const sec = document.createElement('div');
+      sec.className = 'menu-section';
+
+      const items = (section.items || []).map((item, iIdx) => `
+        <div class="menu-item-row" data-item="${iIdx}">
+          <div class="item-handle">⋮⋮</div>
+          <input class="item-input item-name" data-field="name" type="text" value="${escapeHtml(item.name || '')}" placeholder="Nom du plat">
+          <input class="item-input item-price" data-field="price" type="text" value="${escapeHtml(item.price || '')}" placeholder="Prix (ex: 9,50 €)">
+          <input class="item-input item-desc" data-field="desc" type="text" value="${escapeHtml(item.desc || '')}" placeholder="Description (optionnel)">
+          <button class="reorder-btn" data-action="up" title="Monter" ${iIdx === 0 ? 'disabled style="opacity:0.3"' : ''}>↑</button>
+          <button class="reorder-btn" data-action="down" title="Descendre" ${iIdx === section.items.length - 1 ? 'disabled style="opacity:0.3"' : ''}>↓</button>
+          <button class="remove-btn" data-action="remove" title="Supprimer la ligne">×</button>
+        </div>
+      `).join('');
+
+      sec.innerHTML = `
+        <div class="menu-section-header">
+          <input class="menu-section-title-input" data-field="title" type="text" value="${escapeHtml(section.title || '')}" placeholder="Nom de la section (ex: Shawarma)">
+          <input class="menu-section-subtitle-input" data-field="subtitle" type="text" value="${escapeHtml(section.subtitle || '')}" placeholder="Sous-titre / description (optionnel)">
+        </div>
+        <div class="menu-items">${items}</div>
+        <div class="section-actions">
+          <button class="btn-mini" data-action="add-item">+ Ajouter une ligne</button>
+          <button class="btn-mini" data-action="section-up" ${sIdx === 0 ? 'disabled style="opacity:0.3"' : ''}>↑ Monter section</button>
+          <button class="btn-mini" data-action="section-down" ${sIdx === content.menu.length - 1 ? 'disabled style="opacity:0.3"' : ''}>↓ Descendre section</button>
+          <button class="btn-mini danger" data-action="remove-section">🗑 Supprimer cette section</button>
+        </div>
+      `;
+
+      // Listeners section
+      sec.querySelector('[data-field="title"]').oninput = e => { content.menu[sIdx].title = e.target.value; setDirty(true); };
+      sec.querySelector('[data-field="subtitle"]').oninput = e => { content.menu[sIdx].subtitle = e.target.value; setDirty(true); };
+
+      sec.querySelectorAll('.menu-item-row').forEach((row, iIdx) => {
+        row.querySelectorAll('.item-input').forEach(inp => {
+          inp.oninput = () => {
+            const field = inp.dataset.field;
+            content.menu[sIdx].items[iIdx][field] = inp.value;
+            setDirty(true);
+          };
+        });
+        row.querySelector('[data-action="up"]').onclick = () => {
+          if (iIdx > 0) {
+            const arr = content.menu[sIdx].items;
+            [arr[iIdx-1], arr[iIdx]] = [arr[iIdx], arr[iIdx-1]];
+            setDirty(true); renderMenu();
+          }
+        };
+        row.querySelector('[data-action="down"]').onclick = () => {
+          const arr = content.menu[sIdx].items;
+          if (iIdx < arr.length - 1) {
+            [arr[iIdx+1], arr[iIdx]] = [arr[iIdx], arr[iIdx+1]];
+            setDirty(true); renderMenu();
+          }
+        };
+        row.querySelector('[data-action="remove"]').onclick = () => {
+          if (confirm('Supprimer cette ligne ?')) {
+            content.menu[sIdx].items.splice(iIdx, 1);
+            setDirty(true); renderMenu();
+          }
+        };
+      });
+
+      sec.querySelector('[data-action="add-item"]').onclick = () => {
+        content.menu[sIdx].items = content.menu[sIdx].items || [];
+        content.menu[sIdx].items.push({ name: '', price: '', desc: '' });
+        setDirty(true); renderMenu();
+      };
+      sec.querySelector('[data-action="section-up"]').onclick = () => {
+        if (sIdx > 0) {
+          [content.menu[sIdx-1], content.menu[sIdx]] = [content.menu[sIdx], content.menu[sIdx-1]];
+          setDirty(true); renderMenu();
+        }
+      };
+      sec.querySelector('[data-action="section-down"]').onclick = () => {
+        if (sIdx < content.menu.length - 1) {
+          [content.menu[sIdx+1], content.menu[sIdx]] = [content.menu[sIdx], content.menu[sIdx+1]];
+          setDirty(true); renderMenu();
+        }
+      };
+      sec.querySelector('[data-action="remove-section"]').onclick = () => {
+        if (confirm('Supprimer la section "' + (section.title || 'sans titre') + '" et tous ses items ?')) {
+          content.menu.splice(sIdx, 1);
+          setDirty(true); renderMenu();
+        }
+      };
+
+      list.appendChild(sec);
+    });
+  }
+
+  $('#add-section').addEventListener('click', () => {
+    content.menu.push({ title: 'Nouvelle section', subtitle: '', items: [{ name: '', price: '', desc: '' }] });
+    setDirty(true);
+    renderMenu();
+  });
+
+  // ===== Cloud load / save =====
+  async function load(force) {
+    showStatus('Chargement depuis cloud…');
+    try {
+      content = await OSTEPH.fetchContent(!!force);
+      // Garantir structure complète
+      content.cities = content.cities || [];
+      content.menu = content.menu || [];
+      renderCities();
+      renderMenu();
+      setDirty(false);
+      showStatus('✓ Contenu chargé', 'ok');
+    } catch (err) {
+      showStatus('Erreur de chargement : ' + err.message, 'err');
+    }
+  }
+
+  $('#reload-btn').addEventListener('click', () => {
+    if (dirty && !confirm('Tu as des modifications non enregistrées. Recharger les écrasera. Continuer ?')) return;
+    load(true);
+  });
+
+  $('#save-btn').addEventListener('click', async () => {
+    const btn = $('#save-btn');
+    const ss = $('#save-status');
+    btn.disabled = true;
+    ss.textContent = 'Enregistrement en cours…';
+    ss.className = 'save-status saving';
+    try {
+      await OSTEPH.pushContent(content);
+      ss.textContent = '✓ Enregistré dans le cloud';
+      ss.className = 'save-status saved';
+      setDirty(false);
+      setTimeout(() => { if (!dirty) ss.textContent = 'Aucune modification'; }, 3500);
+    } catch (err) {
+      ss.textContent = '⚠ Erreur : ' + err.message;
+      ss.className = 'save-status err';
+      btn.disabled = false;
+    }
+  });
+
+  // Confirmation avant fermeture si dirty
+  window.addEventListener('beforeunload', e => {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // ===== Init =====
+  load(true);
+</script>
+</body>
+</html>

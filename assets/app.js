@@ -1,5 +1,5 @@
 /* ============================================
-   O'STEPH — DB clients (localStorage)
+   O'STEPH — Cloud (clients + content éditable)
    ============================================ */
 
 const OSTEPH = {
@@ -9,9 +9,11 @@ const OSTEPH = {
   KEY_BIN_KEY: 'osteph_bin_key_v1',
   KEY_ADMIN_AUTH: 'osteph_admin_auth_v1',
   KEY_THEME: 'osteph_theme_v1',
+  KEY_CONTENT_CACHE: 'osteph_content_cache_v1',
+  KEY_CONTENT_CACHED_AT: 'osteph_content_cached_at_v1',
   ADMIN_PASSWORD: 'osteph2026',
+  CONTENT_CACHE_MS: 5 * 60 * 1000,
 
-  // ===== Theme =====
   applyTheme(theme) {
     const t = ['bw', 'gold', 'light'].includes(theme) ? theme : 'gold';
     document.documentElement.setAttribute('data-theme', t);
@@ -25,10 +27,6 @@ const OSTEPH = {
     this.applyTheme(saved);
   },
 
-  // ===== Configuration JSONBin =====
-  // Credentials embarqués pour que TOUS les visiteurs (depuis n'importe quel
-  // appareil) puissent inscrire les fidèles dans le même cloud.
-  // Override possible via URL params (?b=...&k=...) ou localStorage admin.
   DEFAULT_BIN_ID: '6a003b66250b1311c32bba97',
   DEFAULT_MASTER_KEY: '$2a$10$Scw0xyvThlXOPIFme7sN7eIoiui5TrbwqiC/uRoeWcbauIVziR2PK',
 
@@ -51,8 +49,108 @@ const OSTEPH = {
     return !!(c.id && c.key);
   },
 
-  // GET la liste des clients depuis JSONBin
-  async cloudFetch() {
+  _normalizeRecord(record) {
+    if (Array.isArray(record)) {
+      return { clients: record, content: this._defaultContent() };
+    }
+    if (typeof record === 'object' && record !== null) {
+      return {
+        clients: Array.isArray(record.clients) ? record.clients : [],
+        content: this._normalizeContent(record.content)
+      };
+    }
+    return { clients: [], content: this._defaultContent() };
+  },
+
+  _normalizeContent(content) {
+    if (!content || typeof content !== 'object') return this._defaultContent();
+    return {
+      cities: Array.isArray(content.cities) ? content.cities : [],
+      menu: Array.isArray(content.menu) ? content.menu : []
+    };
+  },
+
+  _defaultContent() {
+    return {
+      cities: [
+        "St Nazaire sur Charente",
+        "St Sulpice d'Arnoult",
+        "Champagne",
+        "St Jean d'Angély",
+        "St Hippolyte",
+        "Les Nouillers",
+        "St Agnant",
+        "Tonnay Boutonne",
+        "Bords",
+        "Échillais"
+      ],
+      menu: [
+        {
+          title: "Shawarma", subtitle: "",
+          items: [
+            { name: "O' Class", price: "9,50 €", desc: "Salade, tomates, oignons, sauce blanche maison" },
+            { name: "O' Cheese", price: "10,50 €", desc: "Cheddar fondu, salade, tomates, oignons" },
+            { name: "O' Bec", price: "11,00 €", desc: "Bacon, cheddar, salade, tomates, oignons" },
+            { name: "O' Choz", price: "11,50 €", desc: "Chèvre, miel, noix, salade, roquette" },
+            { name: "O' Lards", price: "11,00 €", desc: "Lardons fumés, cheddar, salade, oignons confits" },
+            { name: "O' Steph", price: "12,50 €", desc: "Galette de pomme de terre, poêlée de légumes, salade, carottes, concombre, confit d'oignons (à l'assiette)" }
+          ]
+        },
+        {
+          title: "Gyros", subtitle: "",
+          items: [
+            { name: "O' Gyros Class", price: "9,50 €", desc: "Salade, tomates, oignons, sauce blanche maison" },
+            { name: "O' Gyros Cheese", price: "10,50 €", desc: "Cheddar fondu, salade, tomates, oignons" },
+            { name: "O' Gyros Bec", price: "11,00 €", desc: "Bacon, cheddar, salade, tomates, oignons" },
+            { name: "O' Gyros Choz", price: "11,50 €", desc: "Chèvre, miel, noix, salade, roquette" },
+            { name: "O' Gyros Lards", price: "11,00 €", desc: "Lardons fumés, cheddar, salade, oignons confits" },
+            { name: "O' Gyros Steph", price: "12,50 €", desc: "Galette de pomme de terre, poêlée de légumes, salade, carottes, concombre, confit d'oignons (à l'assiette)" }
+          ]
+        },
+        {
+          title: "O' Kids",
+          subtitle: "3 Tenders, frites, dessert, boisson",
+          items: [{ name: "Menu Enfant", price: "6,50 €", desc: "" }]
+        },
+        {
+          title: "Boissons", subtitle: "",
+          items: [
+            { name: "Soft", price: "2,00 €", desc: "Eau, Coca, Icetea, Oasis, Schweppes agrumes" },
+            { name: "Bière", price: "2,50 €", desc: "" },
+            { name: "Rosé pamplemousse", price: "1,50 €", desc: "" }
+          ]
+        },
+        {
+          title: "Frites", subtitle: "",
+          items: [
+            { name: "Frites Nature", price: "2,00 €", desc: "" },
+            { name: "Frites Cheddar", price: "3,50 €", desc: "" },
+            { name: "Frites Lardons", price: "3,50 €", desc: "" },
+            { name: "Frites Cheddar & Lardons", price: "4,50 €", desc: "" }
+          ]
+        },
+        {
+          title: "Suppléments", subtitle: "",
+          items: [
+            { name: "Cheddar", price: "1,50 €", desc: "" },
+            { name: "Lardons", price: "1,50 €", desc: "" },
+            { name: "Bacon", price: "1,50 €", desc: "" },
+            { name: "Tenders", price: "1,50 €", desc: "" },
+            { name: "Viande Poulet", price: "2,00 €", desc: "" },
+            { name: "Effiloché de Porc", price: "2,00 €", desc: "" },
+            { name: "Planchette apéro (par personne)", price: "5,00 €", desc: "" }
+          ]
+        },
+        {
+          title: "Sauces",
+          subtitle: "Sauce blanche maison, Ketchup, Mayonnaise, Samouraï, Algérienne, Barbecue",
+          items: []
+        }
+      ]
+    };
+  },
+
+  async _cloudFetchRaw() {
     const cfg = this.cloudConfig();
     if (!cfg.id || !cfg.key) throw new Error('NOT_CONFIGURED');
     const r = await fetch(`https://api.jsonbin.io/v3/b/${cfg.id}/latest`, {
@@ -60,50 +158,86 @@ const OSTEPH = {
     });
     if (!r.ok) throw new Error('HTTP_' + r.status);
     const j = await r.json();
-    return Array.isArray(j.record) ? j.record : [];
+    return this._normalizeRecord(j.record);
   },
 
-  // PUT (remplace tout le bin)
-  async cloudPush(arr) {
+  async _cloudPushRaw(record) {
     const cfg = this.cloudConfig();
     if (!cfg.id || !cfg.key) throw new Error('NOT_CONFIGURED');
     const r = await fetch(`https://api.jsonbin.io/v3/b/${cfg.id}`, {
       method: 'PUT',
-      headers: {
-        'X-Master-Key': cfg.key,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(arr)
+      headers: { 'X-Master-Key': cfg.key, 'Content-Type': 'application/json' },
+      body: JSON.stringify(record)
     });
     if (!r.ok) throw new Error('HTTP_' + r.status);
     return true;
   },
 
-  // Ajoute un client (read-modify-write)
-  async cloudAppend(client) {
-    const all = await this.cloudFetch();
-    all.push(client);
-    await this.cloudPush(all);
-    return all;
+  async cloudFetch() {
+    const rec = await this._cloudFetchRaw();
+    return rec.clients;
   },
 
-  // Synchronise local depuis le cloud
+  async cloudPush(arr) {
+    let rec;
+    try { rec = await this._cloudFetchRaw(); }
+    catch (e) { rec = { clients: [], content: this._defaultContent() }; }
+    rec.clients = Array.isArray(arr) ? arr : [];
+    return await this._cloudPushRaw(rec);
+  },
+
+  async cloudAppend(client) {
+    const rec = await this._cloudFetchRaw();
+    rec.clients.push(client);
+    await this._cloudPushRaw(rec);
+    return rec.clients;
+  },
+
   async syncFromCloud() {
-    const arr = await this.cloudFetch();
-    this.saveClients(arr);
+    const rec = await this._cloudFetchRaw();
+    this.saveClients(rec.clients);
     localStorage.setItem('osteph_last_sync', new Date().toISOString());
-    return arr.length;
+    return rec.clients.length;
   },
 
   getLastSync() {
     return localStorage.getItem('osteph_last_sync') || null;
   },
 
-  // ===== Client storage =====
-  loadClients() {
+  async fetchContent(forceRefresh = false) {
+    if (!forceRefresh) {
+      try {
+        const cachedAt = parseInt(localStorage.getItem(this.KEY_CONTENT_CACHED_AT) || '0', 10);
+        if (Date.now() - cachedAt < this.CONTENT_CACHE_MS) {
+          const cached = localStorage.getItem(this.KEY_CONTENT_CACHE);
+          if (cached) return this._normalizeContent(JSON.parse(cached));
+        }
+      } catch (e) {}
+    }
     try {
-      return JSON.parse(localStorage.getItem(this.KEY_CLIENTS) || '[]');
-    } catch (e) { return []; }
+      const rec = await this._cloudFetchRaw();
+      localStorage.setItem(this.KEY_CONTENT_CACHE, JSON.stringify(rec.content));
+      localStorage.setItem(this.KEY_CONTENT_CACHED_AT, String(Date.now()));
+      return rec.content;
+    } catch (err) {
+      return this._defaultContent();
+    }
+  },
+
+  async pushContent(content) {
+    let rec;
+    try { rec = await this._cloudFetchRaw(); }
+    catch (e) { rec = { clients: [], content: this._defaultContent() }; }
+    rec.content = this._normalizeContent(content);
+    await this._cloudPushRaw(rec);
+    localStorage.removeItem(this.KEY_CONTENT_CACHED_AT);
+    localStorage.setItem(this.KEY_CONTENT_CACHE, JSON.stringify(rec.content));
+    return true;
+  },
+
+  loadClients() {
+    try { return JSON.parse(localStorage.getItem(this.KEY_CLIENTS) || '[]'); }
+    catch (e) { return []; }
   },
 
   saveClients(arr) {
@@ -128,7 +262,6 @@ const OSTEPH = {
     localStorage.removeItem('osteph_last_sync');
   },
 
-  // ===== Export CSV =====
   exportCSV() {
     const clients = this.loadClients();
     const headers = ['Numéro', 'Prénom', 'Nom', 'Email', 'Téléphone', 'Menus', 'Inscription'];
@@ -150,7 +283,6 @@ const OSTEPH = {
   }
 };
 
-// ===== Sparkles décoratives (fond animé) =====
 function spawnSparkles(count = 24) {
   const layer = document.querySelector('.sparkle-layer');
   if (!layer) return;
@@ -169,7 +301,6 @@ function spawnSparkles(count = 24) {
 
 document.addEventListener('DOMContentLoaded', () => {
   spawnSparkles();
-  // Init du sélecteur de thème
   document.querySelectorAll('.theme-switcher button').forEach(btn => {
     btn.addEventListener('click', () => OSTEPH.applyTheme(btn.dataset.theme));
   });
