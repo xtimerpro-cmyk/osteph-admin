@@ -1,5 +1,6 @@
 /* ============================================
    O'STEPH — Cloud (clients + content éditable)
+   v4 : ajout schedule (planning + carte)
    ============================================ */
 
 const OSTEPH = {
@@ -66,8 +67,24 @@ const OSTEPH = {
     if (!content || typeof content !== 'object') return this._defaultContent();
     return {
       cities: Array.isArray(content.cities) ? content.cities : [],
-      menu: Array.isArray(content.menu) ? content.menu : []
+      menu: Array.isArray(content.menu) ? content.menu : [],
+      schedule: Array.isArray(content.schedule) ? content.schedule : this._defaultSchedule()
     };
+  },
+
+  _defaultSchedule() {
+    return [
+      { city: "St Nazaire sur Charente", lat: 45.9333, lng: -0.9233, day: "Lundi soir", time: "18h00 - 21h00" },
+      { city: "St Sulpice d'Arnoult", lat: 45.7986, lng: -0.7567, day: "Mardi soir", time: "18h00 - 21h00" },
+      { city: "Champagne", lat: 45.8211, lng: -0.8019, day: "Mercredi soir", time: "18h00 - 21h00" },
+      { city: "St Jean d'Angély", lat: 45.9450, lng: -0.5167, day: "Jeudi soir", time: "18h00 - 21h00" },
+      { city: "St Hippolyte", lat: 45.8439, lng: -0.7589, day: "Vendredi midi", time: "11h30 - 14h00" },
+      { city: "Les Nouillers", lat: 45.9622, lng: -0.6967, day: "Vendredi soir", time: "18h00 - 21h00" },
+      { city: "St Agnant", lat: 45.8639, lng: -0.9472, day: "Samedi midi", time: "11h30 - 14h00" },
+      { city: "Tonnay Boutonne", lat: 45.9606, lng: -0.7836, day: "Samedi soir", time: "18h00 - 21h00" },
+      { city: "Bords", lat: 45.8867, lng: -0.7569, day: "Dimanche midi", time: "11h30 - 14h00" },
+      { city: "Échillais", lat: 45.8889, lng: -0.9836, day: "Dimanche soir", time: "18h00 - 21h00" }
+    ];
   },
 
   _defaultContent() {
@@ -93,7 +110,7 @@ const OSTEPH = {
             { name: "O' Bec", price: "11,00 €", desc: "Bacon, cheddar, salade, tomates, oignons" },
             { name: "O' Choz", price: "11,50 €", desc: "Chèvre, miel, noix, salade, roquette" },
             { name: "O' Lards", price: "11,00 €", desc: "Lardons fumés, cheddar, salade, oignons confits" },
-            { name: "O' Steph", price: "12,50 €", desc: "Galette de pomme de terre, poêlée de légumes, salade, carottes, concombre, confit d'oignons (à l'assiette)" }
+            { name: "O' Steph", price: "12,50 €", desc: "Galette de pomme de terre, poêlée de légumes (à l'assiette)" }
           ]
         },
         {
@@ -101,52 +118,11 @@ const OSTEPH = {
           items: [
             { name: "O' Gyros Class", price: "9,50 €", desc: "Salade, tomates, oignons, sauce blanche maison" },
             { name: "O' Gyros Cheese", price: "10,50 €", desc: "Cheddar fondu, salade, tomates, oignons" },
-            { name: "O' Gyros Bec", price: "11,00 €", desc: "Bacon, cheddar, salade, tomates, oignons" },
-            { name: "O' Gyros Choz", price: "11,50 €", desc: "Chèvre, miel, noix, salade, roquette" },
-            { name: "O' Gyros Lards", price: "11,00 €", desc: "Lardons fumés, cheddar, salade, oignons confits" },
-            { name: "O' Gyros Steph", price: "12,50 €", desc: "Galette de pomme de terre, poêlée de légumes, salade, carottes, concombre, confit d'oignons (à l'assiette)" }
+            { name: "O' Gyros Bec", price: "11,00 €", desc: "Bacon, cheddar, salade, tomates, oignons" }
           ]
-        },
-        {
-          title: "O' Kids",
-          subtitle: "3 Tenders, frites, dessert, boisson",
-          items: [{ name: "Menu Enfant", price: "6,50 €", desc: "" }]
-        },
-        {
-          title: "Boissons", subtitle: "",
-          items: [
-            { name: "Soft", price: "2,00 €", desc: "Eau, Coca, Icetea, Oasis, Schweppes agrumes" },
-            { name: "Bière", price: "2,50 €", desc: "" },
-            { name: "Rosé pamplemousse", price: "1,50 €", desc: "" }
-          ]
-        },
-        {
-          title: "Frites", subtitle: "",
-          items: [
-            { name: "Frites Nature", price: "2,00 €", desc: "" },
-            { name: "Frites Cheddar", price: "3,50 €", desc: "" },
-            { name: "Frites Lardons", price: "3,50 €", desc: "" },
-            { name: "Frites Cheddar & Lardons", price: "4,50 €", desc: "" }
-          ]
-        },
-        {
-          title: "Suppléments", subtitle: "",
-          items: [
-            { name: "Cheddar", price: "1,50 €", desc: "" },
-            { name: "Lardons", price: "1,50 €", desc: "" },
-            { name: "Bacon", price: "1,50 €", desc: "" },
-            { name: "Tenders", price: "1,50 €", desc: "" },
-            { name: "Viande Poulet", price: "2,00 €", desc: "" },
-            { name: "Effiloché de Porc", price: "2,00 €", desc: "" },
-            { name: "Planchette apéro (par personne)", price: "5,00 €", desc: "" }
-          ]
-        },
-        {
-          title: "Sauces",
-          subtitle: "Sauce blanche maison, Ketchup, Mayonnaise, Samouraï, Algérienne, Barbecue",
-          items: []
         }
-      ]
+      ],
+      schedule: this._defaultSchedule()
     };
   },
 
@@ -239,29 +215,22 @@ const OSTEPH = {
     try { return JSON.parse(localStorage.getItem(this.KEY_CLIENTS) || '[]'); }
     catch (e) { return []; }
   },
-
-  saveClients(arr) {
-    localStorage.setItem(this.KEY_CLIENTS, JSON.stringify(arr));
-  },
-
+  saveClients(arr) { localStorage.setItem(this.KEY_CLIENTS, JSON.stringify(arr)); },
   nextNumber() {
     const year = new Date().getFullYear();
     const counter = parseInt(localStorage.getItem(this.KEY_COUNTER) || '0', 10) + 1;
     localStorage.setItem(this.KEY_COUNTER, String(counter));
     return `OS-${year}-${String(counter).padStart(5, '0')}`;
   },
-
   removeClient(number) {
     const clients = this.loadClients().filter(c => c.number !== number);
     this.saveClients(clients);
   },
-
   clearAll() {
     localStorage.removeItem(this.KEY_CLIENTS);
     localStorage.removeItem(this.KEY_COUNTER);
     localStorage.removeItem('osteph_last_sync');
   },
-
   exportCSV() {
     const clients = this.loadClients();
     const headers = ['Numéro', 'Prénom', 'Nom', 'Email', 'Téléphone', 'Menus', 'Inscription'];

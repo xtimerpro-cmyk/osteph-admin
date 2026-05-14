@@ -9,10 +9,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <style>
+  /* ==== ÉLARGISSEMENT FRAME DESKTOP ==== */
+  .frame {
+    max-width: 1400px !important;
+    width: 96vw !important;
+    padding: 30px 36px !important;
+  }
+  @media (min-width: 900px) {
+    .frame { padding: 36px 50px !important; }
+  }
+  @media (min-width: 1200px) {
+    .frame { padding: 40px 70px !important; }
+  }
+
   /* ==== Header ==== */
   .content-header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 18px 28px; border-bottom: 1px solid rgba(207,187,143,0.2);
+    padding: 0 0 18px; border-bottom: 1px solid rgba(207,187,143,0.2);
     margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
   }
   .content-header h1 {
@@ -33,7 +46,7 @@
   .btn-mini.danger:hover { background: rgba(200,117,117,0.1); }
 
   /* ==== Tabs ==== */
-  .tabs { display: flex; gap: 4px; border-bottom: 1px solid rgba(207,187,143,0.15); margin: 0 28px 20px; flex-wrap: wrap; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid rgba(207,187,143,0.15); margin: 0 0 20px; flex-wrap: wrap; }
   .tab {
     padding: 12px 22px; font-family: 'Cinzel', serif; font-size: 12px;
     letter-spacing: 0.18em; text-transform: uppercase; background: transparent;
@@ -45,7 +58,7 @@
 
   /* ==== Cloud status banner ==== */
   .cloud-status {
-    margin: 0 28px 18px; padding: 10px 14px; border-radius: 4px;
+    margin: 0 0 18px; padding: 10px 14px; border-radius: 4px;
     font-family: 'Cormorant Garamond', serif; font-size: 14px;
     background: rgba(207,187,143,0.06); border: 1px solid rgba(207,187,143,0.18);
     color: #cfbb8f; display: none;
@@ -54,8 +67,8 @@
   .cloud-status.ok { color: #8fcfa1; border-color: rgba(143,207,161,0.3); background: rgba(143,207,161,0.05); }
   .cloud-status.err { color: #d88; border-color: rgba(216,136,136,0.3); background: rgba(216,136,136,0.05); }
 
-  /* ==== Section panels ==== */
-  .panel { padding: 0 28px 30px; display: none; }
+  /* ==== Panels ==== */
+  .panel { display: none; padding-bottom: 30px; }
   .panel.active { display: block; }
   .panel-intro {
     font-family: 'Cormorant Garamond', serif; font-size: 15px;
@@ -63,7 +76,7 @@
   }
 
   /* ==== Cities editor ==== */
-  .cities-list { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
+  .cities-list { display: flex; flex-direction: column; gap: 10px; max-width: 880px; }
   .city-row {
     display: flex; align-items: center; gap: 8px; padding: 10px 12px;
     background: rgba(207,187,143,0.04); border: 1px solid rgba(207,187,143,0.18);
@@ -79,7 +92,7 @@
     width: 36px; height: 36px; padding: 0; background: transparent;
     color: #cfbb8f; border: 1px solid rgba(207,187,143,0.25); border-radius: 3px;
     cursor: pointer; font-size: 16px; transition: all 0.2s; display: flex;
-    align-items: center; justify-content: center;
+    align-items: center; justify-content: center; flex-shrink: 0;
   }
   .reorder-btn:hover { background: rgba(207,187,143,0.1); }
   .remove-btn { color: #c87575; border-color: rgba(200,117,117,0.3); }
@@ -117,7 +130,12 @@
   }
   .menu-section-title-input:focus,
   .menu-section-subtitle-input:focus,
-  .item-input { outline: none; border-color: #cfbb8f; }
+  .item-input,
+  .schedule-input { outline: none; }
+  .menu-section-title-input:focus,
+  .menu-section-subtitle-input:focus,
+  .item-input:focus,
+  .schedule-input:focus { border-color: #cfbb8f; }
 
   .menu-items { display: flex; flex-direction: column; gap: 8px; }
   .menu-item-row {
@@ -135,7 +153,6 @@
     border: 1px solid rgba(207,187,143,0.18); border-radius: 3px;
     font-family: 'Cormorant Garamond', serif; font-size: 14px;
   }
-  .item-desc { font-style: italic; }
 
   .section-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 
@@ -148,23 +165,44 @@
   }
   .add-section:hover { background: rgba(207,187,143,0.1); }
 
-  /* Mobile */
-  @media (max-width: 720px) {
-    .content-header { padding: 14px 16px; }
-    .tabs { margin: 0 16px 16px; }
-    .panel { padding: 0 16px 30px; }
-    .menu-item-row {
-      grid-template-columns: 1fr;
-      gap: 6px; padding: 12px;
-    }
-    .item-handle { display: none; }
-    .menu-section { padding: 12px; }
+  /* ==== SCHEDULE editor ==== */
+  .schedule-list { display: flex; flex-direction: column; gap: 12px; }
+  .schedule-row {
+    background: rgba(207,187,143,0.04);
+    border: 1px solid rgba(207,187,143,0.18);
+    border-radius: 4px;
+    padding: 14px;
+    display: grid;
+    grid-template-columns: 28px minmax(180px, 1.4fr) minmax(140px, 1fr) minmax(140px, 1fr) 105px 105px 36px 36px 36px;
+    gap: 8px;
+    align-items: center;
+  }
+  .schedule-row .row-handle {
+    color: rgba(207,187,143,0.4);
+    text-align: center;
+    font-size: 14px;
+  }
+  .schedule-input {
+    padding: 9px 12px; background: transparent; color: #ede0bf;
+    border: 1px solid rgba(207,187,143,0.2); border-radius: 3px;
+    font-family: 'Cormorant Garamond', serif; font-size: 14px;
+    width: 100%;
+  }
+  .schedule-input.is-gps {
+    font-family: 'Cormorant Garamond', monospace;
+    font-size: 12px;
+    color: rgba(237,224,191,0.7);
+  }
+  .schedule-input::placeholder {
+    color: rgba(207,187,143,0.35);
+    font-style: italic;
   }
 
-  /* Save button sticky en bas */
+  /* Save bar sticky */
   .save-bar {
-    position: sticky; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.85));
-    padding: 14px 28px; border-top: 1px solid rgba(207,187,143,0.2);
+    position: sticky; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.97), rgba(0,0,0,0.88));
+    padding: 14px 0; border-top: 1px solid rgba(207,187,143,0.2);
     display: flex; justify-content: space-between; align-items: center;
     margin-top: 16px; backdrop-filter: blur(8px); flex-wrap: wrap; gap: 10px;
   }
@@ -188,6 +226,30 @@
     0%, 100% { box-shadow: 0 0 0 0 rgba(207,187,143,0.5); }
     50% { box-shadow: 0 0 0 6px rgba(207,187,143,0); }
   }
+
+  /* Mobile */
+  @media (max-width: 880px) {
+    .frame { padding: 18px 14px !important; }
+    .content-header { padding: 0 0 14px; }
+    .menu-item-row {
+      grid-template-columns: 1fr;
+      gap: 6px; padding: 12px;
+    }
+    .item-handle { display: none; }
+    .schedule-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 12px;
+    }
+    .schedule-row .row-handle { display: none; }
+    .schedule-input.is-city {
+      grid-column: span 2;
+    }
+    .schedule-input.is-gps {
+      grid-column: span 2;
+    }
+    .menu-section { padding: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -205,31 +267,44 @@
   <div id="cloud-status" class="cloud-status"></div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="cities">Villes (ticker défilant)</button>
-    <button class="tab" data-tab="menu">Menu (sandwichs & boissons)</button>
+    <button class="tab active" data-tab="cities">Villes (ticker)</button>
+    <button class="tab" data-tab="menu">Menu</button>
+    <button class="tab" data-tab="schedule">Planning &amp; Carte</button>
   </div>
 
-  <!-- ==== TAB VILLES ==== -->
+  <!-- TAB VILLES -->
   <section class="panel active" id="panel-cities">
     <p class="panel-intro">
-      Les villes apparaissent dans le bandeau défilant en haut de la page d'accueil et de la page menu.
-      Modifie, ajoute, supprime ou réordonne avec les boutons. <strong>Pense à enregistrer en bas.</strong>
+      Villes affichées dans le bandeau défilant de l'accueil et du menu.
+      <strong>Pour gérer le planning et la carte, va dans l'onglet Planning &amp; Carte.</strong>
     </p>
     <div class="cities-list" id="cities-list"></div>
     <button class="add-row" id="add-city">+ Ajouter une ville</button>
   </section>
 
-  <!-- ==== TAB MENU ==== -->
+  <!-- TAB MENU -->
   <section class="panel" id="panel-menu">
     <p class="panel-intro">
-      Édite le menu complet : sections (Shawarma, Gyros, etc.), items (nom + prix + description).
-      Tu peux ajouter ou supprimer des lignes ou des sections entières. <strong>Pense à enregistrer en bas.</strong>
+      Édite le menu : sections, items (nom, prix, description). Tu peux ajouter ou supprimer
+      des lignes ou des sections entières.
     </p>
     <div id="menu-list"></div>
     <button class="add-section" id="add-section">+ Ajouter une section</button>
   </section>
 
-  <!-- ==== Save bar ==== -->
+  <!-- TAB PLANNING & CARTE -->
+  <section class="panel" id="panel-schedule">
+    <p class="panel-intro">
+      Le <strong>planning</strong> alimente la carte interactive et la grille horaire de la page d'accueil.
+      Pour chaque arrêt : <strong>ville</strong>, <strong>jour</strong> (ex. "Lundi soir"), <strong>horaires</strong> (ex. "18h00 - 21h00"),
+      et les <strong>coordonnées GPS</strong> (latitude / longitude) pour placer l'épingle sur la carte.<br>
+      💡 Pour trouver les coordonnées d'une ville, va sur <a href="https://www.google.com/maps" target="_blank" style="color:#cfbb8f;">Google Maps</a>,
+      clique droit sur la ville et copie les chiffres affichés (ex: 45.9333, -0.9233).
+    </p>
+    <div class="schedule-list" id="schedule-list"></div>
+    <button class="add-row" id="add-stop">+ Ajouter un arrêt</button>
+  </section>
+
   <div class="save-bar">
     <span class="save-status" id="save-status">Aucune modification</span>
     <button class="btn-save" id="save-btn" disabled>💾 Enregistrer dans le cloud</button>
@@ -238,14 +313,17 @@
 
 <script src="assets/app.js"></script>
 <script>
-  // Note : pas de check auth (sinon redirection bug). Page protégée par URL non publique.
-
-  let content = { cities: [], menu: [] };
+  let content = { cities: [], menu: [], schedule: [] };
   let dirty = false;
 
-  // ===== UI helpers =====
   const $ = sel => document.querySelector(sel);
   const $$ = sel => document.querySelectorAll(sel);
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
 
   function showStatus(msg, type) {
     const el = $('#cloud-status');
@@ -271,7 +349,7 @@
     }
   }
 
-  // ===== Tabs =====
+  // Tabs
   $$('.tab').forEach(btn => {
     btn.addEventListener('click', () => {
       $$('.tab').forEach(b => b.classList.remove('active'));
@@ -281,7 +359,7 @@
     });
   });
 
-  // ===== CITIES rendering =====
+  // ===== CITIES =====
   function renderCities() {
     const list = $('#cities-list');
     list.innerHTML = '';
@@ -302,40 +380,36 @@
       list.appendChild(row);
     });
   }
-
   $('#add-city').addEventListener('click', () => {
     content.cities.push('');
     setDirty(true);
     renderCities();
-    // focus sur le nouveau champ
     const inputs = $$('.city-input');
     if (inputs.length) inputs[inputs.length - 1].focus();
   });
 
-  // ===== MENU rendering =====
+  // ===== MENU =====
   function renderMenu() {
     const list = $('#menu-list');
     list.innerHTML = '';
     content.menu.forEach((section, sIdx) => {
       const sec = document.createElement('div');
       sec.className = 'menu-section';
-
       const items = (section.items || []).map((item, iIdx) => `
-        <div class="menu-item-row" data-item="${iIdx}">
+        <div class="menu-item-row">
           <div class="item-handle">⋮⋮</div>
-          <input class="item-input item-name" data-field="name" type="text" value="${escapeHtml(item.name || '')}" placeholder="Nom du plat">
-          <input class="item-input item-price" data-field="price" type="text" value="${escapeHtml(item.price || '')}" placeholder="Prix (ex: 9,50 €)">
-          <input class="item-input item-desc" data-field="desc" type="text" value="${escapeHtml(item.desc || '')}" placeholder="Description (optionnel)">
-          <button class="reorder-btn" data-action="up" title="Monter" ${iIdx === 0 ? 'disabled style="opacity:0.3"' : ''}>↑</button>
-          <button class="reorder-btn" data-action="down" title="Descendre" ${iIdx === section.items.length - 1 ? 'disabled style="opacity:0.3"' : ''}>↓</button>
-          <button class="remove-btn" data-action="remove" title="Supprimer la ligne">×</button>
+          <input class="item-input" data-field="name" type="text" value="${escapeHtml(item.name || '')}" placeholder="Nom du plat">
+          <input class="item-input" data-field="price" type="text" value="${escapeHtml(item.price || '')}" placeholder="Prix (ex: 9,50 €)">
+          <input class="item-input" data-field="desc" type="text" value="${escapeHtml(item.desc || '')}" placeholder="Description (optionnel)">
+          <button class="reorder-btn" data-action="up" ${iIdx === 0 ? 'disabled style="opacity:0.3"' : ''}>↑</button>
+          <button class="reorder-btn" data-action="down" ${iIdx === section.items.length - 1 ? 'disabled style="opacity:0.3"' : ''}>↓</button>
+          <button class="remove-btn" data-action="remove">×</button>
         </div>
       `).join('');
-
       sec.innerHTML = `
         <div class="menu-section-header">
-          <input class="menu-section-title-input" data-field="title" type="text" value="${escapeHtml(section.title || '')}" placeholder="Nom de la section (ex: Shawarma)">
-          <input class="menu-section-subtitle-input" data-field="subtitle" type="text" value="${escapeHtml(section.subtitle || '')}" placeholder="Sous-titre / description (optionnel)">
+          <input class="menu-section-title-input" data-field="title" type="text" value="${escapeHtml(section.title || '')}" placeholder="Nom de la section">
+          <input class="menu-section-subtitle-input" data-field="subtitle" type="text" value="${escapeHtml(section.subtitle || '')}" placeholder="Sous-titre (optionnel)">
         </div>
         <div class="menu-items">${items}</div>
         <div class="section-actions">
@@ -345,16 +419,12 @@
           <button class="btn-mini danger" data-action="remove-section">🗑 Supprimer cette section</button>
         </div>
       `;
-
-      // Listeners section
       sec.querySelector('[data-field="title"]').oninput = e => { content.menu[sIdx].title = e.target.value; setDirty(true); };
       sec.querySelector('[data-field="subtitle"]').oninput = e => { content.menu[sIdx].subtitle = e.target.value; setDirty(true); };
-
       sec.querySelectorAll('.menu-item-row').forEach((row, iIdx) => {
         row.querySelectorAll('.item-input').forEach(inp => {
           inp.oninput = () => {
-            const field = inp.dataset.field;
-            content.menu[sIdx].items[iIdx][field] = inp.value;
+            content.menu[sIdx].items[iIdx][inp.dataset.field] = inp.value;
             setDirty(true);
           };
         });
@@ -379,7 +449,6 @@
           }
         };
       });
-
       sec.querySelector('[data-action="add-item"]').onclick = () => {
         content.menu[sIdx].items = content.menu[sIdx].items || [];
         content.menu[sIdx].items.push({ name: '', price: '', desc: '' });
@@ -403,15 +472,70 @@
           setDirty(true); renderMenu();
         }
       };
-
       list.appendChild(sec);
     });
   }
-
   $('#add-section').addEventListener('click', () => {
     content.menu.push({ title: 'Nouvelle section', subtitle: '', items: [{ name: '', price: '', desc: '' }] });
     setDirty(true);
     renderMenu();
+  });
+
+  // ===== SCHEDULE =====
+  function renderSchedule() {
+    const list = $('#schedule-list');
+    list.innerHTML = '';
+    content.schedule.forEach((stop, i) => {
+      const row = document.createElement('div');
+      row.className = 'schedule-row';
+      row.innerHTML = `
+        <div class="row-handle">⋮⋮</div>
+        <input class="schedule-input is-city" data-field="city" type="text" value="${escapeHtml(stop.city || '')}" placeholder="Ville">
+        <input class="schedule-input" data-field="day" type="text" value="${escapeHtml(stop.day || '')}" placeholder="Jour (ex: Lundi soir)">
+        <input class="schedule-input" data-field="time" type="text" value="${escapeHtml(stop.time || '')}" placeholder="Horaire (ex: 18h-21h)">
+        <input class="schedule-input is-gps" data-field="lat" type="number" step="0.0001" value="${stop.lat == null ? '' : stop.lat}" placeholder="Latitude">
+        <input class="schedule-input is-gps" data-field="lng" type="number" step="0.0001" value="${stop.lng == null ? '' : stop.lng}" placeholder="Longitude">
+        <button class="reorder-btn" data-action="up" ${i === 0 ? 'disabled style="opacity:0.3"' : ''}>↑</button>
+        <button class="reorder-btn" data-action="down" ${i === content.schedule.length - 1 ? 'disabled style="opacity:0.3"' : ''}>↓</button>
+        <button class="remove-btn" data-action="remove">×</button>
+      `;
+      row.querySelectorAll('.schedule-input').forEach(inp => {
+        inp.oninput = () => {
+          const field = inp.dataset.field;
+          if (field === 'lat' || field === 'lng') {
+            const v = parseFloat(inp.value);
+            content.schedule[i][field] = isNaN(v) ? null : v;
+          } else {
+            content.schedule[i][field] = inp.value;
+          }
+          setDirty(true);
+        };
+      });
+      row.querySelector('[data-action="up"]').onclick = () => {
+        if (i > 0) {
+          [content.schedule[i-1], content.schedule[i]] = [content.schedule[i], content.schedule[i-1]];
+          setDirty(true); renderSchedule();
+        }
+      };
+      row.querySelector('[data-action="down"]').onclick = () => {
+        if (i < content.schedule.length - 1) {
+          [content.schedule[i+1], content.schedule[i]] = [content.schedule[i], content.schedule[i+1]];
+          setDirty(true); renderSchedule();
+        }
+      };
+      row.querySelector('[data-action="remove"]').onclick = () => {
+        if (confirm('Supprimer l\'arrêt "' + (stop.city || 'sans nom') + '" ?')) {
+          content.schedule.splice(i, 1);
+          setDirty(true); renderSchedule();
+        }
+      };
+      list.appendChild(row);
+    });
+  }
+  $('#add-stop').addEventListener('click', () => {
+    content.schedule.push({ city: '', day: '', time: '', lat: null, lng: null });
+    setDirty(true);
+    renderSchedule();
   });
 
   // ===== Cloud load / save =====
@@ -419,11 +543,12 @@
     showStatus('Chargement depuis cloud…');
     try {
       content = await OSTEPH.fetchContent(!!force);
-      // Garantir structure complète
       content.cities = content.cities || [];
       content.menu = content.menu || [];
+      content.schedule = content.schedule || [];
       renderCities();
       renderMenu();
+      renderSchedule();
       setDirty(false);
       showStatus('✓ Contenu chargé', 'ok');
     } catch (err) {
@@ -455,18 +580,11 @@
     }
   });
 
-  // Confirmation avant fermeture si dirty
   window.addEventListener('beforeunload', e => {
     if (dirty) { e.preventDefault(); e.returnValue = ''; }
   });
 
-  function escapeHtml(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-
-  // ===== Init =====
+  // Init
   load(true);
 </script>
 </body>
