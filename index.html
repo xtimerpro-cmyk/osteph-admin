@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0708">
+<title>Back Office — O'Steph</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/logo.png" type="image/png">
+<script>(function(){try{var t=localStorage.getItem("osteph_theme_v1")||"gold";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+</head>
+<body>
+<div class="theme-switcher" role="group" aria-label="Thème">
+  <button data-theme="bw" title="Noir & Blanc" aria-label="Thème noir et blanc"></button>
+  <button data-theme="gold" title="Doré chic" aria-label="Thème doré"></button>
+  <button data-theme="light" title="Clair" aria-label="Thème clair"></button>
+</div>
+
+
+<div class="sparkle-layer"></div>
+
+<!-- ===== LOGIN ===== -->
+<div id="login-view" class="frame fade-in" style="max-width:440px;">
+  <span class="corner-star tl">✦</span>
+  <span class="corner-star bl">✦</span>
+
+  <div class="logo-block">
+    <img src="assets/logo.png" alt="O'Steph" class="logo-img" style="max-width:180px;">
+    <div class="tagline">Back Office</div>
+  </div>
+
+  <form id="login-form">
+    <div class="form-group">
+      <label class="form-label" for="pwd">Mot de passe</label>
+      <input class="form-input" type="password" id="pwd" required autocomplete="current-password">
+    </div>
+    <div id="login-error" class="notice error" style="display:none;">Mot de passe incorrect.</div>
+    <button type="submit" class="btn btn-primary btn-block">Connexion</button>
+  </form>
+
+  <div class="footer">
+    <a href="https://xtimerpro-cmyk.github.io/osteph/" target="_blank">→ Voir le site public</a>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dash-view" class="frame" style="display:none; max-width:1000px;">
+  <span class="corner-star tl">✦</span>
+  <span class="corner-star bl">✦</span>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:8px;">
+    <div style="display:flex; align-items:center; gap:14px;">
+      <img src="assets/logo.png" alt="" style="height:48px; filter:drop-shadow(0 0 12px rgba(212,175,55,0.3));">
+      <div>
+        <div style="font-family:'Cinzel',serif; font-size:14px; letter-spacing:0.3em; color:var(--gold-bright);">BACK OFFICE</div>
+        <div style="font-size:12px; color:var(--gold-soft); letter-spacing:0.15em;">Gestion fidélité</div>
+      </div>
+    </div>
+    <button class="btn btn-sm" id="logout-btn">Déconnexion</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Stats -->
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+    <span class="admin-stat">Total clients : <strong id="stat-total">0</strong></span>
+    <span class="admin-stat">Aujourd'hui : <strong id="stat-today">0</strong></span>
+    <span class="admin-stat">Ce mois : <strong id="stat-month">0</strong></span>
+    <span class="admin-stat">Menus servis : <strong id="stat-menus">0</strong></span>
+    <span class="admin-stat">Récompenses dues : <strong id="stat-rewards">0</strong></span>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="admin-bar">
+    <input type="search" id="search" placeholder="Rechercher (nom, tel, n°…)">
+    <button class="btn btn-sm" id="sync-btn">⟳ Synchroniser</button>
+    <a href="qr.html" class="btn btn-sm" target="_blank" style="text-decoration:none;">📱 Mode QR</a>
+    <button class="btn btn-sm" id="export-btn">Export CSV</button>
+    <button class="btn btn-sm" id="config-btn">⚙ Config JSONBin</button>
+    <button class="btn btn-sm" id="clear-btn" style="border-color:#6b1f1f; color:#d49696;">Tout effacer (local)</button>
+  </div>
+
+  <div id="sync-status" style="font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.15em; color:var(--silver-soft); margin: -6px 0 12px; min-height:16px;"></div>
+
+  <!-- Config JSONBin -->
+  <div id="config-panel" style="display:none; padding:14px; background:rgba(255,255,255,0.04); border:1px solid var(--silver-deep); border-radius:2px; margin-bottom:14px;">
+    <div class="form-label" style="margin-bottom:8px;">Bin ID</div>
+    <input class="form-input" type="text" id="bin-id" placeholder="6612abc1234567890abcdef0">
+    <div class="form-label" style="margin: 12px 0 8px;">Master Key</div>
+    <input class="form-input" type="text" id="bin-key" placeholder="$2a$10$XXXXXXXXXXXXXXXXX...">
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button class="btn btn-sm" id="save-bin">Enregistrer</button>
+      <button class="btn btn-sm" id="test-bin">Tester</button>
+      <button class="btn btn-sm" id="close-config">Fermer</button>
+    </div>
+    <p style="font-size:12px; opacity:0.7; margin-top:10px; line-height:1.5;">
+      Voir le bloc « Setup JSONBin » ci-dessous pour les instructions complètes.
+    </p>
+  </div>
+
+  <!-- Table -->
+  <div style="overflow-x:auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Prénom</th>
+          <th>Nom</th>
+          <th class="hide-sm">Email</th>
+          <th>Tél.</th>
+          <th>Menus</th>
+          <th class="hide-sm">Inscrit le</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="clients-tbody">
+        <!-- rempli en JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <div id="empty-msg" class="empty-state" style="display:none;">
+    Aucun client inscrit pour le moment.<br>Les inscriptions via la page fidélité apparaîtront ici.
+  </div>
+
+  <!-- Setup instructions -->
+  <details style="margin-top:30px; padding:14px; background:rgba(255,255,255,0.03); border:1px solid var(--silver-deep); border-radius:2px;">
+    <summary style="cursor:pointer; font-family:'Cinzel',serif; font-size:12px; letter-spacing:0.2em; color:var(--white);">
+      ⚙ SETUP JSONBIN (5 minutes)
+    </summary>
+    <div style="margin-top:14px; font-size:14px; line-height:1.7; color:var(--cream);">
+      <p>JSONBin est un service de stockage JSON gratuit (10 000 requêtes/mois). Sans lui, les téléphones des clients qui scannent le QR ne peuvent rien enregistrer chez toi.</p>
+
+      <p style="margin-top:14px;"><strong>1.</strong> Va sur <a href="https://jsonbin.io" target="_blank" style="color:var(--white);">jsonbin.io</a> et crée un compte gratuit (juste email + mdp).</p>
+
+      <p><strong>2.</strong> Une fois connecté, clique <em>« Create Bin »</em> en haut à droite.</p>
+
+      <p><strong>3.</strong> Dans le contenu, efface tout et remplace par juste :</p>
+      <code style="display:block; padding:8px 12px; background:var(--black); color:var(--white); border-radius:2px; margin:8px 0; font-size:14px;">[]</code>
+      <p>Donne-lui un nom genre <em>« osteph-clients »</em> et clique <em>« Create »</em>.</p>
+
+      <p><strong>4.</strong> Copie le <strong>BIN ID</strong> (visible dans l'URL de la page après création, après <code>/bin/</code> — c'est une longue chaîne de 24 caractères).</p>
+
+      <p><strong>5.</strong> Va dans le menu <em>« API Keys »</em> à gauche → copie le <strong>X-MASTER-KEY</strong> (commence par <code>$2a$10$...</code>).</p>
+
+      <p><strong>6.</strong> Reviens ici, clique <em>« ⚙ Config JSONBin »</em> en haut, colle le Bin ID + Master Key, puis <em>« Tester »</em>.</p>
+
+      <p style="margin-top:14px; font-style:italic; opacity:0.85;">À partir de là, chaque client qui scanne le QR + tape ses infos est automatiquement ajouté à ton bin, et tu peux tout voir/gérer ici. ✦</p>
+
+      <p style="margin-top:10px; font-size:12px; opacity:0.6; line-height:1.5;">
+      ⚠ Le Master Key est embarqué dans chaque QR (sinon le tel du client ne pourrait pas écrire). Quelqu'un de techniquement curieux pourrait l'extraire et écrire dans ton bin. Pour un food truck, le risque est faible. Si tu vois du spam, tu peux régénérer la clé sur jsonbin.io.
+      </p>
+    </div>
+  </details>
+
+  <div class="footer" style="margin-top:30px;">O'Steph Back Office</div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+const ADMIN_PASSWORD = 'osteph2026'; // ← CHANGE LE MOT DE PASSE ICI
+
+// ===== Auth =====
+const loginView = document.getElementById('login-view');
+const dashView = document.getElementById('dash-view');
+
+function isAuth() {
+  return sessionStorage.getItem(OSTEPH.KEY_ADMIN_AUTH) === '1';
+}
+
+function showDash() {
+  loginView.style.display = 'none';
+  dashView.style.display = 'block';
+  refresh();
+  doSync(true); // sync auto silencieuse à l'ouverture du dashboard
+}
+
+if (isAuth()) showDash();
+
+document.getElementById('login-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const pwd = document.getElementById('pwd').value;
+  if (pwd === ADMIN_PASSWORD) {
+    sessionStorage.setItem(OSTEPH.KEY_ADMIN_AUTH, '1');
+    showDash();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem(OSTEPH.KEY_ADMIN_AUTH);
+  location.reload();
+});
+
+// ===== Affichage clients =====
+function refresh() {
+  const all = OSTEPH.loadClients();
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const filtered = q
+    ? all.filter(c => Object.values(c).some(v => String(v).toLowerCase().includes(q)))
+    : all;
+
+  const tbody = document.getElementById('clients-tbody');
+  const empty = document.getElementById('empty-msg');
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    // Plus récent en haut
+    [...filtered].reverse().forEach(c => {
+      const tr = document.createElement('tr');
+      const dateStr = new Date(c.created).toLocaleDateString('fr-FR') +
+        ' ' + new Date(c.created).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+      const dash = (v) => v && v.trim() ? escapeHtml(v) : '<span style="color:var(--silver-deep);">—</span>';
+      const sourceBadge = c.source === 'qr'
+        ? '<span style="font-size:9px; padding:2px 6px; background:rgba(255,255,255,0.08); border:1px solid var(--silver-deep); border-radius:8px; letter-spacing:0.1em; vertical-align:middle; margin-left:6px; color:var(--silver-soft);">QR</span>'
+        : '';
+      const menus = parseInt(c.menus || 0, 10);
+      // Récompense due tous les 10 menus
+      const rewardDue = menus > 0 && menus % 10 === 0;
+      const rewardBadge = rewardDue
+        ? '<span title="Récompense disponible !" style="margin-left:6px; font-size:14px;">🎁</span>'
+        : '';
+      tr.innerHTML = `
+        <td class="num">${c.number}${sourceBadge}</td>
+        <td>${dash(c.prenom)}</td>
+        <td>${dash(c.nom)}</td>
+        <td class="hide-sm">${dash(c.email)}</td>
+        <td>${dash(c.telephone)}</td>
+        <td class="menus-cell">
+          <div class="menus-control">
+            <button class="menu-btn minus" data-num="${c.number}" data-action="dec" title="Retirer 1 menu">−</button>
+            <span class="menus-count ${rewardDue ? 'reward-due' : ''}">${menus}</span>
+            <button class="menu-btn plus" data-num="${c.number}" data-action="inc" title="Ajouter 1 menu">+</button>
+            ${rewardBadge}
+          </div>
+        </td>
+        <td class="hide-sm">${dateStr}</td>
+        <td><button class="del-btn" data-num="${c.number}">Supprimer</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Stats
+  updateStatsOnly(all);
+
+  // ===== Bind +/- menus avec debounce et feedback visuel =====
+  // On regroupe les clics rapides (genre +5 d'un coup) en un seul push cloud
+  const pendingPushes = {};
+  function scheduleCloudPush(num, cell) {
+    clearTimeout(pendingPushes[num]);
+    pendingPushes[num] = setTimeout(async () => {
+      delete pendingPushes[num];
+      if (!OSTEPH.isCloudConfigured()) {
+        cell.classList.add('saved-local');
+        setTimeout(() => cell.classList.remove('saved-local'), 1500);
+        return;
+      }
+      cell.classList.add('saving');
+      try {
+        await OSTEPH.cloudPush(OSTEPH.loadClients());
+        cell.classList.remove('saving');
+        cell.classList.add('saved');
+        setTimeout(() => cell.classList.remove('saved'), 1500);
+        const time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+        setSyncStatus(`✓ Sauvegardé dans le cloud · ${time}`);
+      } catch (err) {
+        cell.classList.remove('saving');
+        cell.classList.add('save-error');
+        setTimeout(() => cell.classList.remove('save-error'), 2500);
+        setSyncStatus('⚠ Erreur sync — réessayez');
+      }
+    }, 700); // 700ms après le dernier clic on push
+  }
+
+  tbody.querySelectorAll('.menu-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const num = btn.dataset.num;
+      const action = btn.dataset.action;
+      const all = OSTEPH.loadClients();
+      const idx = all.findIndex(c => c.number === num);
+      if (idx === -1) return;
+
+      const current = parseInt(all[idx].menus || 0, 10);
+      const next = action === 'inc' ? current + 1 : Math.max(0, current - 1);
+      all[idx].menus = next;
+      all[idx].last_visit = new Date().toISOString();
+      OSTEPH.saveClients(all);
+
+      // Mise à jour immédiate du compteur sans full refresh (perf + pas de flicker)
+      const tr = btn.closest('tr');
+      const countEl = tr.querySelector('.menus-count');
+      const cell = tr.querySelector('.menus-cell');
+      if (countEl) {
+        countEl.textContent = next;
+        // Toggle reward state
+        const rewardDue = next > 0 && next % 10 === 0;
+        countEl.classList.toggle('reward-due', rewardDue);
+        // Animation pulse au clic
+        countEl.classList.remove('pulse');
+        void countEl.offsetWidth; // reflow pour relancer l'anim
+        countEl.classList.add('pulse');
+      }
+      // Refresh stats globales (sans toucher au DOM des lignes)
+      updateStatsOnly(all);
+
+      // Schedule cloud push (debounced)
+      scheduleCloudPush(num, cell);
+    });
+  });
+
+  // Bind suppression
+  tbody.querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const num = btn.dataset.num;
+      if (!confirm(`Supprimer définitivement le client ${num} ?`)) return;
+
+      // 1. Suppression locale immédiate (UX instantanée)
+      OSTEPH.removeClient(num);
+      refresh();
+
+      // 2. Si cloud configuré, on push la nouvelle liste
+      if (OSTEPH.isCloudConfigured()) {
+        setSyncStatus('Suppression dans le cloud…');
+        try {
+          await OSTEPH.cloudPush(OSTEPH.loadClients());
+          setSyncStatus('✓ Supprimé du cloud · ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}));
+        } catch (err) {
+          setSyncStatus('⚠ Erreur cloud — re-synchronise pour annuler');
+        }
+      }
+    });
+  });
+}
+
+function updateStatsOnly(all) {
+  document.getElementById('stat-total').textContent = all.length;
+  const today = new Date().toDateString();
+  const thisMonth = new Date().toISOString().slice(0,7);
+  document.getElementById('stat-today').textContent =
+    all.filter(c => new Date(c.created).toDateString() === today).length;
+  document.getElementById('stat-month').textContent =
+    all.filter(c => c.created.slice(0,7) === thisMonth).length;
+  const totalMenus = all.reduce((sum, c) => sum + parseInt(c.menus || 0, 10), 0);
+  const rewardsDue = all.filter(c => {
+    const m = parseInt(c.menus || 0, 10);
+    return m > 0 && m % 10 === 0;
+  }).length;
+  document.getElementById('stat-menus').textContent = totalMenus;
+  document.getElementById('stat-rewards').textContent = rewardsDue;
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, m =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ===== Sync status helper =====
+function setSyncStatus(msg) {
+  document.getElementById('sync-status').textContent = msg || '';
+}
+
+// ===== Sync depuis le cloud =====
+async function doSync(silent = false) {
+  if (!OSTEPH.isCloudConfigured()) {
+    if (!silent) alert('Configure d\'abord JSONBin via ⚙ Config JSONBin');
+    setSyncStatus('⚠ JSONBin non configuré · les inscriptions QR ne seront pas reçues');
+    return;
+  }
+  setSyncStatus('Synchronisation…');
+  try {
+    const count = await OSTEPH.syncFromCloud();
+    refresh();
+    const time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+    setSyncStatus(`✓ Synchronisé · ${count} clients · ${time}`);
+  } catch (err) {
+    setSyncStatus('⚠ Erreur synchro : ' + (err.message || 'inconnue'));
+    if (!silent) alert('Synchro échouée : ' + err.message);
+  }
+}
+
+// Bouton sync manuel (l'auto-sync se fait dans showDash())
+document.getElementById('sync-btn').addEventListener('click', () => doSync(false));
+
+// ===== Toolbar =====
+document.getElementById('search').addEventListener('input', refresh);
+
+document.getElementById('export-btn').addEventListener('click', () => {
+  if (OSTEPH.loadClients().length === 0) {
+    alert('Aucun client à exporter.');
+    return;
+  }
+  OSTEPH.exportCSV();
+});
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  if (OSTEPH.loadClients().length === 0) {
+    alert('Aucun client à effacer.');
+    return;
+  }
+  if (confirm('⚠ Cela efface uniquement la copie LOCALE. Le cloud n\'est PAS touché. Continuer ?')) {
+    OSTEPH.clearAll();
+    refresh();
+    setSyncStatus('Cache local vidé · clique « Synchroniser » pour recharger depuis le cloud');
+  }
+});
+
+// ===== Config JSONBin =====
+const cfgPanel = document.getElementById('config-panel');
+const binIdInput = document.getElementById('bin-id');
+const binKeyInput = document.getElementById('bin-key');
+
+document.getElementById('config-btn').addEventListener('click', () => {
+  const cfg = OSTEPH.cloudConfig();
+  binIdInput.value = cfg.id || '';
+  binKeyInput.value = cfg.key || '';
+  cfgPanel.style.display = cfgPanel.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('close-config').addEventListener('click', () => {
+  cfgPanel.style.display = 'none';
+});
+
+document.getElementById('save-bin').addEventListener('click', () => {
+  OSTEPH.setCloudConfig(binIdInput.value, binKeyInput.value);
+  alert('Configuration enregistrée. Les prochains scans QR enverront les données dans ton bin.');
+  cfgPanel.style.display = 'none';
+  doSync(true);
+});
+
+document.getElementById('test-bin').addEventListener('click', async () => {
+  // Sauvegarde temporaire pour tester
+  OSTEPH.setCloudConfig(binIdInput.value, binKeyInput.value);
+  setSyncStatus('Test en cours…');
+  try {
+    const arr = await OSTEPH.cloudFetch();
+    alert('✓ Connexion réussie ! ' + arr.length + ' enregistrement(s) dans le bin.');
+    setSyncStatus('✓ Connexion OK · ' + arr.length + ' clients dans le bin');
+  } catch (err) {
+    alert('✗ Erreur : ' + err.message + '\n\nVérifie le Bin ID et le Master Key.');
+    setSyncStatus('⚠ Test échoué : ' + err.message);
+  }
+});
+</script>
+</body>
+</html>
