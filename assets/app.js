@@ -68,7 +68,40 @@ const OSTEPH = {
     return {
       cities: Array.isArray(content.cities) ? content.cities : [],
       menu: Array.isArray(content.menu) ? content.menu : [],
-      schedule: Array.isArray(content.schedule) ? content.schedule : this._defaultSchedule()
+      schedule: Array.isArray(content.schedule) ? content.schedule : this._defaultSchedule(),
+      settings: this._normalizeSettings(content.settings)
+    };
+  },
+
+  _normalizeSettings(s) {
+    const def = this._defaultSettings();
+    if (!s || typeof s !== 'object') return def;
+    return {
+      phone: typeof s.phone === 'string' ? s.phone : def.phone,
+      phoneInternational: typeof s.phoneInternational === 'string' ? s.phoneInternational : def.phoneInternational,
+      tagline: typeof s.tagline === 'string' ? s.tagline : def.tagline,
+      taglineSub: typeof s.taglineSub === 'string' ? s.taglineSub : def.taglineSub,
+      facebook: typeof s.facebook === 'string' ? s.facebook : def.facebook,
+      instagram: typeof s.instagram === 'string' ? s.instagram : def.instagram,
+      tiktok: typeof s.tiktok === 'string' ? s.tiktok : def.tiktok,
+      offerTitle: typeof s.offerTitle === 'string' ? s.offerTitle : def.offerTitle,
+      offerThreshold: typeof s.offerThreshold === 'number' ? s.offerThreshold : def.offerThreshold,
+      showSakura: typeof s.showSakura === 'boolean' ? s.showSakura : def.showSakura
+    };
+  },
+
+  _defaultSettings() {
+    return {
+      phone: '06 75 90 91 84',
+      phoneInternational: '33675909184',
+      tagline: 'Shawarma · Gyros',
+      taglineSub: 'Food Truck · Charente-Maritime',
+      facebook: 'https://facebook.com/',
+      instagram: 'https://instagram.com/',
+      tiktok: 'https://tiktok.com/',
+      offerTitle: "1 O'Class ou 1 O'Gyros offert tous les 10 passages",
+      offerThreshold: 10,
+      showSakura: true
     };
   },
 
@@ -122,7 +155,8 @@ const OSTEPH = {
           ]
         }
       ],
-      schedule: this._defaultSchedule()
+      schedule: this._defaultSchedule(),
+      settings: this._defaultSettings()
     };
   },
 
