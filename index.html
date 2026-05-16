@@ -3,448 +3,2128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0a0708">
-<title>Back Office — O'Steph</title>
-<link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="assets/logo.png" type="image/png">
-<script>(function(){try{var t=localStorage.getItem("osteph_theme_v1")||"gold";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<title>O'Steph · Administration</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Marcellus&display=swap" rel="stylesheet">
+
+<script src="assets/app.js"></script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #cfbb8f;
+    --gold-light: #ede0bf;
+    --gold-dark: #9c8857;
+    --gold-deep: #5a4520;
+    --bg: #0a0805;
+    --bg-soft: #100c08;
+    --bg-card: #14110b;
+    --bg-card-2: #1a1610;
+    --bg-elev: #211c14;
+    --border: rgba(207, 187, 143, 0.14);
+    --border-soft: rgba(207, 187, 143, 0.08);
+    --border-strong: rgba(207, 187, 143, 0.4);
+    --text: #ede0bf;
+    --text-dim: rgba(237, 224, 191, 0.62);
+    --text-faint: rgba(237, 224, 191, 0.35);
+    --green: #4ade80;
+    --red: #f87171;
+    --orange: #fb923c;
+    --blue: #60a5fa;
+    --purple: #c084fc;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body {
+    background:
+      radial-gradient(ellipse 800px 600px at 90% -10%, rgba(207, 187, 143, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 600px 400px at -10% 100%, rgba(207, 187, 143, 0.03) 0%, transparent 60%),
+      var(--bg);
+  }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+  /* ========================= LOGIN ========================= */
+  .login-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 30% 20%, rgba(207, 187, 143, 0.08), transparent 40%),
+      radial-gradient(circle at 70% 80%, rgba(207, 187, 143, 0.05), transparent 40%);
+    display: flex;
+    align-items: center; justify-content: center;
+    padding: 24px;
+    animation: fadeIn 0.4s;
+  }
+  .login-card {
+    width: 100%; max-width: 420px;
+    background: linear-gradient(165deg, var(--bg-card-2) 0%, var(--bg-card) 100%);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 42px 38px 32px;
+    box-shadow:
+      0 0 0 1px rgba(207, 187, 143, 0.06) inset,
+      0 30px 60px rgba(0, 0, 0, 0.7),
+      0 0 80px rgba(207, 187, 143, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 15%; right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .login-logo img {
+    height: 100px;
+    filter: drop-shadow(0 0 18px rgba(207, 187, 143, 0.45));
+  }
+  .login-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.14em;
+    text-align: center;
+    margin-bottom: 4px;
+    background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .login-sub {
+    font-family: 'Marcellus', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .login-field { margin-bottom: 14px; }
+  .login-label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .login-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    border-radius: 6px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .login-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 3px rgba(207, 187, 143, 0.12);
+  }
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 14px rgba(207, 187, 143, 0.2);
+  }
+  .login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(207, 187, 143, 0.35);
+  }
+  .login-error {
+    color: var(--red);
+    font-size: 13px;
+    text-align: center;
+    margin-top: 10px;
+    min-height: 18px;
+  }
+
+  /* ========================= APP LAYOUT ========================= */
+  .app {
+    display: grid;
+    grid-template-areas:
+      "sidebar topbar"
+      "sidebar main";
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: 60px 1fr;
+    min-height: 100vh;
+  }
+  .app.sidebar-collapsed {
+    grid-template-columns: 64px 1fr;
+  }
+
+  /* ========================= TOPBAR ========================= */
+  .topbar {
+    grid-area: topbar;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 24px;
+    background: rgba(10, 8, 5, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0; z-index: 50;
+  }
+  .topbar-menu-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--gold);
+    width: 36px; height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .topbar-menu-btn:hover {
+    background: rgba(207, 187, 143, 0.06);
+    border-color: var(--gold);
+  }
+  .topbar-breadcrumb {
+    display: flex; align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+  .topbar-crumb {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .topbar-crumb.current {
+    color: var(--gold-light);
+  }
+  .topbar-crumb-sep {
+    color: var(--text-faint);
+    font-size: 10px;
+  }
+  .topbar-search {
+    flex: 1;
+    max-width: 320px;
+    position: relative;
+  }
+  .topbar-search-input {
+    width: 100%;
+    padding: 8px 14px 8px 36px;
+    background: rgba(207, 187, 143, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .topbar-search-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(0, 0, 0, 0.4);
+  }
+  .topbar-search-icon {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 14px;
+    pointer-events: none;
+  }
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topbar-save {
+    padding: 8px 18px;
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    color: var(--green);
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .topbar-save.dirty {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: #000;
+    border-color: var(--gold);
+    font-weight: 600;
+    animation: savePulse 1.8s ease-in-out infinite;
+  }
+  @keyframes savePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(207, 187, 143, 0); }
+    50% { box-shadow: 0 0 0 6px rgba(207, 187, 143, 0.18); }
+  }
+  .topbar-save:not(.dirty):not(:disabled):hover {
+    background: rgba(74, 222, 128, 0.14);
+  }
+  .topbar-save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .topbar-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    background: rgba(207, 187, 143, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
+  .topbar-profile-name {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--gold-light);
+  }
+  .topbar-profile-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* ========================= SIDEBAR ========================= */
+  .sidebar {
+    grid-area: sidebar;
+    background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .sidebar-brand {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 60px;
+  }
+  .sidebar-brand img {
+    height: 32px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 10px rgba(207, 187, 143, 0.45));
+  }
+  .sidebar-brand-text {
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    transition: opacity 0.2s;
+  }
+  .sidebar-brand-name {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .sidebar-brand-sub {
+    font-family: 'Marcellus', serif;
+    font-style: italic;
+    font-size: 10px;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+  .app.sidebar-collapsed .sidebar-brand { justify-content: center; padding: 18px 0; }
+  .app.sidebar-collapsed .sidebar-brand-text { display: none; }
+
+  .sidebar-nav {
+    padding: 10px 12px;
+    flex: 1;
+  }
+  .sidebar-section {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding: 14px 14px 6px;
+    font-weight: 500;
+  }
+  .app.sidebar-collapsed .sidebar-section { display: none; }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+    position: relative;
+  }
+  .sidebar-item .icon {
+    font-size: 16px;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .sidebar-item .label {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .sidebar-item .chevron {
+    font-size: 10px;
+    transition: transform 0.2s;
+    opacity: 0.5;
+  }
+  .sidebar-item.open .chevron { transform: rotate(90deg); }
+  .sidebar-item:hover {
+    background: rgba(207, 187, 143, 0.06);
+    color: var(--text);
+  }
+  .sidebar-item.active {
+    background: linear-gradient(90deg, rgba(207, 187, 143, 0.16) 0%, rgba(207, 187, 143, 0.04) 100%);
+    color: var(--gold-light);
+    border-color: rgba(207, 187, 143, 0.18);
+  }
+  .sidebar-item.active::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 25%; bottom: 25%;
+    width: 3px;
+    background: linear-gradient(180deg, var(--gold-light), var(--gold-dark));
+    border-radius: 0 3px 3px 0;
+  }
+  .app.sidebar-collapsed .sidebar-item .label,
+  .app.sidebar-collapsed .sidebar-item .chevron { display: none; }
+  .app.sidebar-collapsed .sidebar-item { justify-content: center; padding: 10px; }
+
+  .sidebar-submenu {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.25s;
+    margin-left: 8px;
+    border-left: 1px solid var(--border);
+    padding-left: 8px;
+    margin-top: 2px;
+  }
+  .sidebar-submenu.open {
+    max-height: 400px;
+  }
+  .sidebar-subitem {
+    display: block;
+    padding: 8px 12px;
+    color: var(--text-faint);
+    text-decoration: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    border-radius: 4px;
+    margin-bottom: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sidebar-subitem:hover {
+    color: var(--gold-light);
+    background: rgba(207, 187, 143, 0.04);
+  }
+  .sidebar-subitem.active {
+    color: var(--gold-light);
+    background: rgba(207, 187, 143, 0.08);
+  }
+  .app.sidebar-collapsed .sidebar-submenu { display: none; }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .logout-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .logout-btn:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .app.sidebar-collapsed .logout-btn .lbl { display: none; }
+
+  /* ========================= MAIN ========================= */
+  .main {
+    grid-area: main;
+    padding: 28px 36px 100px;
+    overflow-x: hidden;
+  }
+
+  .view { display: none; animation: viewIn 0.3s; }
+  .view.active { display: block; }
+  @keyframes viewIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .view-header {
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .view-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dark) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  }
+  .view-subtitle {
+    font-family: 'Marcellus', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* ========================= ACCUEIL ========================= */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: linear-gradient(165deg, var(--bg-card-2) 0%, var(--bg-card) 100%);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s;
+  }
+  .stat-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+  }
+  .stat-icon-wrap {
+    display: inline-flex;
+    width: 38px; height: 38px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(207, 187, 143, 0.08);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+  .stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 46px;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  }
+  .stat-foot {
+    font-family: 'Marcellus', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+  .stat-card.green .stat-icon-wrap { background: rgba(74, 222, 128, 0.08); border-color: rgba(74, 222, 128, 0.3); }
+  .stat-card.green .stat-value { background: linear-gradient(180deg, #bbf7d0, #4ade80); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stat-card.blue .stat-icon-wrap { background: rgba(96, 165, 250, 0.08); border-color: rgba(96, 165, 250, 0.3); }
+  .stat-card.blue .stat-value { background: linear-gradient(180deg, #bfdbfe, #60a5fa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stat-card.purple .stat-icon-wrap { background: rgba(192, 132, 252, 0.08); border-color: rgba(192, 132, 252, 0.3); }
+  .stat-card.purple .stat-value { background: linear-gradient(180deg, #e9d5ff, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* Quick actions */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 36px 0 18px;
+  }
+  .section-divider-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.18em;
+    color: var(--gold-light);
+  }
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-strong), transparent);
+  }
+
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+  .quick-card {
+    background: linear-gradient(165deg, var(--bg-card-2) 0%, var(--bg-card) 100%);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .quick-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 90% -20%, rgba(207, 187, 143, 0.12), transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .quick-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  .quick-card:hover::before { opacity: 1; }
+  .quick-icon {
+    width: 42px; height: 42px;
+    border-radius: 8px;
+    background: rgba(207, 187, 143, 0.08);
+    border: 1px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .quick-title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+  .quick-desc {
+    font-family: 'Marcellus', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* ========================= CARDS générique ========================= */
+  .card {
+    background: linear-gradient(165deg, var(--bg-card-2) 0%, var(--bg-card) 100%);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 12%; right: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title .ico {
+    font-size: 16px;
+  }
+  .card-subtitle {
+    font-family: 'Marcellus', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Help block in cards */
+  .help-block {
+    background: rgba(207, 187, 143, 0.04);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    font-family: 'Marcellus', serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-dim);
+  }
+  .help-block strong { color: var(--gold-light); font-weight: 500; }
+  .help-block code {
+    background: rgba(207, 187, 143, 0.1);
+    color: var(--gold-light);
+    padding: 1px 5px; border-radius: 3px;
+    font-size: 11px;
+    font-family: monospace;
+  }
+  .help-block a { color: var(--gold); }
+
+  /* ========================= INPUTS ========================= */
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+  }
+  .field-help {
+    font-family: 'Marcellus', serif;
+    font-size: 12px;
+    color: var(--text-faint);
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .input {
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    border-radius: 6px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(0, 0, 0, 0.6);
+  }
+  .input.small { max-width: 140px; }
+
+  /* ========================= BUTTONS ========================= */
+  .btn {
+    padding: 9px 16px;
+    background: rgba(207, 187, 143, 0.06);
+    border: 1px solid var(--border-strong);
+    color: var(--gold-light);
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn:hover {
+    background: rgba(207, 187, 143, 0.14);
+    border-color: var(--gold);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: #000;
+    border-color: var(--gold);
+    font-weight: 600;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 4px 18px rgba(207, 187, 143, 0.4);
+  }
+  .btn-danger:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .btn-add {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    color: var(--gold);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    margin-top: 12px;
+  }
+  .btn-add:hover {
+    border-color: var(--gold);
+    background: rgba(207, 187, 143, 0.06);
+    color: var(--gold-light);
+  }
+
+  /* ========================= CITIES ========================= */
+  .pill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: rgba(207, 187, 143, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .pill:hover { border-color: var(--border-strong); }
+  .pill input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    padding: 4px;
+  }
+  .pill input:focus { outline: none; }
+  .btn-remove {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+  .btn-remove:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  /* ========================= MENU ========================= */
+  .menu-section {
+    background: linear-gradient(165deg, var(--bg-card-2) 0%, var(--bg-card) 100%);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .menu-section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .menu-section-title {
+    flex: 1;
+    padding: 8px 14px;
+    background: rgba(207, 187, 143, 0.06);
+    border: 1px solid var(--border-strong);
+    color: var(--gold-light);
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .menu-section-title:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(207, 187, 143, 0.1);
+  }
+  .menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .menu-item-row {
+    display: grid;
+    grid-template-columns: 1fr 110px 30px;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    background: rgba(207, 187, 143, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .menu-item-row input {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    width: 100%;
+  }
+  .menu-item-row input:focus {
+    outline: none;
+    background: rgba(0, 0, 0, 0.4);
+    border-color: var(--gold);
+  }
+  .menu-item-row input.price {
+    text-align: right;
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  /* ========================= SCHEDULE ========================= */
+  .schedule-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1.2fr 1.2fr 0.9fr 0.9fr 30px;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 14px;
+    background: linear-gradient(135deg,
+      rgba(232, 232, 238, 0.04) 0%,
+      rgba(180, 180, 195, 0.02) 50%,
+      rgba(232, 232, 238, 0.04) 100%);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .schedule-row::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(207, 187, 143, 0.4), transparent);
+  }
+  .schedule-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+  }
+  .schedule-input:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .schedule-input.is-gps {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--gold-light);
+  }
+
+  /* ========================= CLIENTS TABLE ========================= */
+  .clients-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .clients-count {
+    padding: 6px 14px;
+    background: rgba(207, 187, 143, 0.12);
+    border: 1px solid var(--border-strong);
+    color: var(--gold-light);
+    border-radius: 999px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+  }
+  .clients-search {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+  }
+  table.clients-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: linear-gradient(165deg, var(--bg-card-2) 0%, var(--bg-card) 100%);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .clients-table thead th {
+    background: rgba(0, 0, 0, 0.4);
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+  }
+  .clients-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .clients-table tbody tr:hover {
+    background: rgba(207, 187, 143, 0.04);
+  }
+  .clients-table tbody tr:last-child td { border-bottom: none; }
+  .num-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    background: rgba(207, 187, 143, 0.12);
+    border: 1px solid var(--border-strong);
+    color: var(--gold-light);
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .visits-cell {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .visits-bar {
+    width: 80px;
+    height: 6px;
+    background: rgba(207, 187, 143, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .visits-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transition: width 0.4s;
+  }
+  .visits-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    color: var(--gold-light);
+    min-width: 24px;
+    text-align: right;
+  }
+  .reward-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    color: #000;
+    border-radius: 999px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    box-shadow: 0 0 14px rgba(251, 191, 36, 0.4);
+  }
+  .empty-state {
+    padding: 60px 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-family: 'Marcellus', serif;
+    font-style: italic;
+  }
+
+  /* ========================= TOAST ========================= */
+  .toast-container {
+    position: fixed;
+    top: 76px;
+    right: 24px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    padding: 12px 18px;
+    background: linear-gradient(165deg, var(--bg-elev) 0%, var(--bg-card) 100%);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Marcellus', serif;
+    font-size: 14px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    animation: toastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 240px;
+    pointer-events: auto;
+  }
+  .toast.success { border-left: 3px solid var(--green); }
+  .toast.error { border-left: 3px solid var(--red); }
+  .toast.info { border-left: 3px solid var(--blue); }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ========================= MOBILE ========================= */
+  @media (max-width: 900px) {
+    .app {
+      grid-template-areas: "topbar" "main";
+      grid-template-columns: 1fr;
+      grid-template-rows: 60px 1fr;
+    }
+    .sidebar {
+      position: fixed;
+      top: 60px; left: 0; bottom: 0;
+      z-index: 60;
+      width: 240px;
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+      height: calc(100vh - 60px);
+    }
+    .app.sidebar-open .sidebar {
+      transform: translateX(0);
+    }
+    .app.sidebar-open::after {
+      content: '';
+      position: fixed;
+      top: 60px; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 55;
+    }
+    .topbar-breadcrumb { display: none; }
+    .topbar-search { max-width: 100%; }
+    .topbar-profile-name { display: none; }
+    .main { padding: 20px 18px 80px; }
+    .view-title { font-size: 28px; }
+    .schedule-row {
+      grid-template-columns: 1fr 1fr;
+    }
+    .schedule-input.is-city, .schedule-input.is-gps { grid-column: span 2; }
+  }
+  @media (max-width: 600px) {
+    .topbar-search { display: none; }
+    .topbar-save .lbl { display: none; }
+  }
+</style>
 </head>
 <body>
-<div class="theme-switcher" role="group" aria-label="Thème">
-  <button data-theme="bw" title="Noir & Blanc" aria-label="Thème noir et blanc"></button>
-  <button data-theme="gold" title="Doré chic" aria-label="Thème doré"></button>
-  <button data-theme="light" title="Clair" aria-label="Thème clair"></button>
-</div>
 
-
-<div class="sparkle-layer"></div>
-
-<!-- ===== LOGIN ===== -->
-<div id="login-view" class="frame fade-in" style="max-width:440px;">
-  <span class="corner-star tl">✦</span>
-  <span class="corner-star bl">✦</span>
-
-  <div class="logo-block">
-    <img src="assets/logo.png" alt="O'Steph" class="logo-img" style="max-width:180px;">
-    <div class="tagline">Back Office</div>
-  </div>
-
-  <form id="login-form">
-    <div class="form-group">
-      <label class="form-label" for="pwd">Mot de passe</label>
-      <input class="form-input" type="password" id="pwd" required autocomplete="current-password">
+<!-- ====== LOGIN ====== -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="assets/logo.png" alt="O'Steph">
     </div>
-    <div id="login-error" class="notice error" style="display:none;">Mot de passe incorrect.</div>
-    <button type="submit" class="btn btn-primary btn-block">Connexion</button>
-  </form>
-
-  <div class="footer">
-    <a href="https://xtimerpro-cmyk.github.io/osteph/" target="_blank">→ Voir le site public</a>
+    <div class="login-title">O'STEPH</div>
+    <div class="login-sub">Espace administration</div>
+    <div class="login-field">
+      <label class="login-label">Mot de passe</label>
+      <input class="login-input" type="password" id="login-input" placeholder="••••••••" autocomplete="off">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Se connecter →</button>
+    <div class="login-error" id="login-error"></div>
   </div>
 </div>
 
-<!-- ===== DASHBOARD ===== -->
-<div id="dash-view" class="frame" style="display:none; max-width:1000px;">
-  <span class="corner-star tl">✦</span>
-  <span class="corner-star bl">✦</span>
+<!-- ====== APP ====== -->
+<div class="app" id="app" style="display:none">
 
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:8px;">
-    <div style="display:flex; align-items:center; gap:14px;">
-      <img src="assets/logo.png" alt="" style="height:48px; filter:drop-shadow(0 0 12px rgba(212,175,55,0.3));">
-      <div>
-        <div style="font-family:'Cinzel',serif; font-size:14px; letter-spacing:0.3em; color:var(--gold-bright);">BACK OFFICE</div>
-        <div style="font-size:12px; color:var(--gold-soft); letter-spacing:0.15em;">Gestion fidélité</div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/logo.png" alt="O'Steph">
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">O'Steph</div>
+        <div class="sidebar-brand-sub">Administration</div>
       </div>
     </div>
-    <button class="btn btn-sm" id="logout-btn">Déconnexion</button>
-  </div>
 
-  <div class="divider"></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">Général</div>
+      <div class="sidebar-item active" data-view="home">
+        <span class="icon">📊</span>
+        <span class="label">Tableau de bord</span>
+      </div>
 
-  <!-- Stats -->
-  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
-    <span class="admin-stat">Total clients : <strong id="stat-total">0</strong></span>
-    <span class="admin-stat">Aujourd'hui : <strong id="stat-today">0</strong></span>
-    <span class="admin-stat">Ce mois : <strong id="stat-month">0</strong></span>
-    <span class="admin-stat">Menus servis : <strong id="stat-menus">0</strong></span>
-    <span class="admin-stat">Récompenses dues : <strong id="stat-rewards">0</strong></span>
-  </div>
+      <div class="sidebar-section">Contenu</div>
+      <div class="sidebar-item" data-toggle="content">
+        <span class="icon">✏️</span>
+        <span class="label">Éditer le site</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="sidebar-submenu" id="submenu-content">
+        <a class="sidebar-subitem" data-view="cities">Villes (ticker)</a>
+        <a class="sidebar-subitem" data-view="menu">Menu</a>
+        <a class="sidebar-subitem" data-view="schedule">Planning & Carte</a>
+      </div>
 
-  <!-- Toolbar -->
-  <div class="admin-bar">
-    <input type="search" id="search" placeholder="Rechercher (nom, tel, n°…)">
-    <button class="btn btn-sm" id="sync-btn">⟳ Synchroniser</button>
-    <a href="qr.html" class="btn btn-sm" target="_blank" style="text-decoration:none;">📱 Mode QR</a>
-    <button class="btn btn-sm" id="export-btn">Export CSV</button>
-    <button class="btn btn-sm" id="config-btn">⚙ Config JSONBin</button>
-    <button class="btn btn-sm" id="clear-btn" style="border-color:#6b1f1f; color:#d49696;">Tout effacer (local)</button>
-  </div>
+      <div class="sidebar-section">Clients</div>
+      <div class="sidebar-item" data-view="clients">
+        <span class="icon">👥</span>
+        <span class="label">Programme fidélité</span>
+      </div>
 
-  <div id="sync-status" style="font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.15em; color:var(--silver-soft); margin: -6px 0 12px; min-height:16px;"></div>
+      <div class="sidebar-section">Configuration</div>
+      <div class="sidebar-item" data-toggle="settings">
+        <span class="icon">⚙️</span>
+        <span class="label">Réglages</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="sidebar-submenu" id="submenu-settings">
+        <a class="sidebar-subitem" data-view="settings-phone">Téléphone</a>
+        <a class="sidebar-subitem" data-view="settings-social">Réseaux sociaux</a>
+        <a class="sidebar-subitem" data-view="settings-tagline">Slogan</a>
+        <a class="sidebar-subitem" data-view="settings-offer">Offre fidélité</a>
+        <a class="sidebar-subitem" data-view="settings-animation">Animation</a>
+      </div>
 
-  <!-- Config JSONBin -->
-  <div id="config-panel" style="display:none; padding:14px; background:rgba(255,255,255,0.04); border:1px solid var(--silver-deep); border-radius:2px; margin-bottom:14px;">
-    <div class="form-label" style="margin-bottom:8px;">Bin ID</div>
-    <input class="form-input" type="text" id="bin-id" placeholder="6612abc1234567890abcdef0">
-    <div class="form-label" style="margin: 12px 0 8px;">Master Key</div>
-    <input class="form-input" type="text" id="bin-key" placeholder="$2a$10$XXXXXXXXXXXXXXXXX...">
-    <div style="display:flex; gap:8px; margin-top:12px;">
-      <button class="btn btn-sm" id="save-bin">Enregistrer</button>
-      <button class="btn btn-sm" id="test-bin">Tester</button>
-      <button class="btn btn-sm" id="close-config">Fermer</button>
+      <div class="sidebar-section">Camion</div>
+      <div class="sidebar-item" data-view="qr">
+        <span class="icon">📱</span>
+        <span class="label">Mode QR kiosque</span>
+      </div>
+
+      <div class="sidebar-section">Extérieur</div>
+      <a class="sidebar-item" href="https://osteph.fr" target="_blank">
+        <span class="icon">🌐</span>
+        <span class="label">Voir le site public</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">
+        <span>⏻</span><span class="lbl">Déconnexion</span>
+      </button>
     </div>
-    <p style="font-size:12px; opacity:0.7; margin-top:10px; line-height:1.5;">
-      Voir le bloc « Setup JSONBin » ci-dessous pour les instructions complètes.
-    </p>
-  </div>
+  </aside>
 
-  <!-- Table -->
-  <div style="overflow-x:auto;">
-    <table class="admin-table">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="topbar-menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-breadcrumb">
+      <span class="topbar-crumb">O'Steph</span>
+      <span class="topbar-crumb-sep">›</span>
+      <span class="topbar-crumb current" id="crumb-view">Tableau de bord</span>
+    </div>
+    <div class="topbar-search">
+      <span class="topbar-search-icon">🔍</span>
+      <input type="text" class="topbar-search-input" id="global-search" placeholder="Rechercher…">
+    </div>
+    <div class="topbar-actions">
+      <button class="topbar-save" id="topbar-save" disabled>
+        <span>✓</span><span class="lbl">Synchronisé</span>
+      </button>
+      <div class="topbar-profile">
+        <span class="topbar-profile-name">Stéphanie</span>
+        <div class="topbar-profile-avatar">S</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ====== VIEW: HOME ====== -->
+    <section class="view active" id="view-home">
+      <div class="view-header">
+        <div class="view-title">Tableau de bord</div>
+        <div class="view-subtitle" id="home-subtitle">Bienvenue Stéphanie</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrap">👥</div>
+          <div class="stat-label">Total clients</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-foot">Inscrits au programme</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon-wrap">🎁</div>
+          <div class="stat-label">Avec récompense</div>
+          <div class="stat-value" id="stat-reward">0</div>
+          <div class="stat-foot">À débloquer</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon-wrap">✨</div>
+          <div class="stat-label">Cette semaine</div>
+          <div class="stat-value" id="stat-week">0</div>
+          <div class="stat-foot">Nouveaux inscrits</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon-wrap">📈</div>
+          <div class="stat-label">Ce mois-ci</div>
+          <div class="stat-value" id="stat-month">0</div>
+          <div class="stat-foot">Croissance fidélité</div>
+        </div>
+      </div>
+
+      <div class="section-divider">
+        <span class="section-divider-title">Accès rapide</span>
+      </div>
+      <div class="quick-grid">
+        <a class="quick-card" data-view-jump="menu">
+          <div class="quick-icon">🍔</div>
+          <div class="quick-title">Modifier le menu</div>
+          <div class="quick-desc">Plats, prix, sections — modifs en direct</div>
+        </a>
+        <a class="quick-card" data-view-jump="schedule">
+          <div class="quick-icon">📅</div>
+          <div class="quick-title">Mettre à jour la tournée</div>
+          <div class="quick-desc">Villes, jours, horaires de la carte</div>
+        </a>
+        <a class="quick-card" data-view-jump="settings-phone">
+          <div class="quick-icon">⚙️</div>
+          <div class="quick-title">Réglages</div>
+          <div class="quick-desc">Téléphone, sociaux, offre fidélité</div>
+        </a>
+        <a class="quick-card" data-view-jump="clients">
+          <div class="quick-icon">👥</div>
+          <div class="quick-title">Voir les clients</div>
+          <div class="quick-desc">Liste, recherche, export CSV</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ====== VIEW: CITIES ====== -->
+    <section class="view" id="view-cities">
+      <div class="view-header">
+        <div class="view-title">Villes (ticker)</div>
+        <div class="view-subtitle">Bandeau défilant en haut de la page d'accueil</div>
+      </div>
+      <div class="card">
+        <div class="help-block">
+          Le <strong>ticker des villes</strong> est le bandeau défilant qui s'affiche en haut de la page d'accueil.
+          <strong>Astuce :</strong> garde des noms courts (max 20 caractères) pour un défilement fluide.
+        </div>
+        <div class="pill-grid" id="cities-list"></div>
+        <button class="btn-add" id="add-city">+ Ajouter une ville</button>
+      </div>
+    </section>
+
+    <!-- ====== VIEW: MENU ====== -->
+    <section class="view" id="view-menu">
+      <div class="view-header">
+        <div class="view-title">Menu</div>
+        <div class="view-subtitle">Plats et prix affichés sur la page Menu</div>
+      </div>
+      <div class="help-block">
+        Organise le menu par sections (Shawarma, Gyros, Boissons, etc.). Pour chaque plat indique son
+        <strong>nom</strong> et son <strong>prix</strong> (avec le symbole €).
+      </div>
+      <div id="menu-list"></div>
+      <button class="btn-add" id="add-section">+ Ajouter une section</button>
+    </section>
+
+    <!-- ====== VIEW: SCHEDULE ====== -->
+    <section class="view" id="view-schedule">
+      <div class="view-header">
+        <div class="view-title">Planning & Carte</div>
+        <div class="view-subtitle">Arrêts de la tournée et coordonnées GPS</div>
+      </div>
+      <div class="card">
+        <div class="help-block">
+          Pour chaque arrêt : <strong>ville</strong>, <strong>jour</strong> (ex. "Lundi soir"),
+          <strong>horaires</strong> (ex. "18h00 - 21h00") et les <strong>coordonnées GPS</strong>.<br>
+          💡 Pour les GPS : <a href="https://www.google.com/maps" target="_blank">Google Maps</a> →
+          clic droit sur une ville → copie les chiffres (ex: <code>45.9333, -0.9233</code>).
+        </div>
+        <div id="schedule-list"></div>
+        <button class="btn-add" id="add-stop">+ Ajouter un arrêt</button>
+      </div>
+    </section>
+
+    <!-- ====== VIEW: CLIENTS ====== -->
+    <section class="view" id="view-clients">
+      <div class="view-header">
+        <div class="view-title">Programme fidélité</div>
+        <div class="view-subtitle">Tous les clients inscrits avec leur progression</div>
+      </div>
+
+      <div class="clients-toolbar">
+        <span class="clients-count" id="count-badge">0 clients</span>
+        <div class="clients-search">
+          <span class="topbar-search-icon">🔍</span>
+          <input type="text" class="topbar-search-input" id="search-input" placeholder="Rechercher un client…">
+        </div>
+        <button class="btn" onclick="exportCSV()">↓ Export CSV</button>
+      </div>
+
+      <div id="clients-body"></div>
+    </section>
+
+    <!-- ====== SETTINGS: PHONE ====== -->
+    <section class="view" id="view-settings-phone">
+      <div class="view-header">
+        <div class="view-title">Téléphone</div>
+        <div class="view-subtitle">Numéro affiché sur le site et le chatbot WhatsApp</div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="ico">📞</span> Numéros</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Numéro affiché</span>
+          <input class="input" type="text" data-setting="phone" placeholder="06 75 90 91 84">
+          <span class="field-help">Format affiché sur le site (avec ou sans espaces)</span>
+        </div>
+        <div class="field">
+          <span class="field-label">Numéro WhatsApp (format international)</span>
+          <input class="input" type="text" data-setting="phoneInternational" placeholder="33675909184">
+          <span class="field-help">Format : 33 (pour la France) + numéro sans le 0 initial. Ex : 33675909184</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== SETTINGS: SOCIAL ====== -->
+    <section class="view" id="view-settings-social">
+      <div class="view-header">
+        <div class="view-title">Réseaux sociaux</div>
+        <div class="view-subtitle">Liens vers tes comptes officiels</div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="ico">🌐</span> Comptes</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Lien Facebook</span>
+          <input class="input" type="url" data-setting="facebook" placeholder="https://facebook.com/osteph">
+        </div>
+        <div class="field">
+          <span class="field-label">Lien Instagram</span>
+          <input class="input" type="url" data-setting="instagram" placeholder="https://instagram.com/osteph">
+        </div>
+        <div class="field">
+          <span class="field-label">Lien TikTok</span>
+          <input class="input" type="url" data-setting="tiktok" placeholder="https://tiktok.com/@osteph">
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== SETTINGS: TAGLINE ====== -->
+    <section class="view" id="view-settings-tagline">
+      <div class="view-header">
+        <div class="view-title">Slogan & Tagline</div>
+        <div class="view-subtitle">Texte affiché à côté du logo dans le header</div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="ico">📝</span> Header</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Slogan principal</span>
+          <input class="input" type="text" data-setting="tagline" placeholder="Shawarma · Gyros">
+        </div>
+        <div class="field">
+          <span class="field-label">Sous-titre</span>
+          <input class="input" type="text" data-setting="taglineSub" placeholder="Food Truck · Charente-Maritime">
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== SETTINGS: OFFER ====== -->
+    <section class="view" id="view-settings-offer">
+      <div class="view-header">
+        <div class="view-title">Offre fidélité</div>
+        <div class="view-subtitle">Récompense affichée dans la popup et la bannière fidélité</div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="ico">🎁</span> Récompense</div>
+        </div>
+        <div class="field">
+          <span class="field-label">Titre de l'offre</span>
+          <input class="input" type="text" data-setting="offerTitle" placeholder="1 O'Class ou 1 O'Gyros offert tous les 10 passages">
+        </div>
+        <div class="field">
+          <span class="field-label">Nombre de passages pour la récompense</span>
+          <input class="input small" type="number" min="1" max="50" data-setting="offerThreshold" placeholder="10">
+          <span class="field-help">Utilisé par le back office pour déclencher le badge 🎁 dans la liste des clients</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== SETTINGS: ANIMATION ====== -->
+    <section class="view" id="view-settings-animation">
+      <div class="view-header">
+        <div class="view-title">Animation</div>
+        <div class="view-subtitle">Effets visuels de la page d'accueil</div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="ico">🌸</span> Pluie de fleurs</div>
+        </div>
+        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:8px 0;">
+          <input type="checkbox" data-setting="showSakura" style="width:20px;height:20px;accent-color:var(--gold);">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:15px;">Afficher la pluie de fleurs de cerisier roses sur la page d'accueil</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- ====== VIEW: QR ====== -->
+    <section class="view" id="view-qr">
+      <div class="view-header">
+        <div class="view-title">Mode QR kiosque</div>
+        <div class="view-subtitle">Affichage tablette pour inscriptions sur place</div>
+      </div>
+      <div class="card">
+        <div class="help-block">
+          Ouvre cette page sur une tablette posée à côté du camion. Les clients scannent le QR code
+          pour s'inscrire au programme fidélité directement avec leur téléphone.
+        </div>
+        <div style="text-align:center;padding:30px 0;">
+          <a href="qr.html" target="_blank" class="btn btn-primary" style="padding:14px 30px;font-size:12px;">
+            Ouvrir le mode kiosque →
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ====== TOASTS ====== -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+const PASSWORD = 'osteph2026';
+
+// ==============================
+// LOGIN
+// ==============================
+function checkLogin() {
+  if (sessionStorage.getItem('osteph_admin_logged') === '1') {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('app').style.display = 'grid';
+    bootApp();
+  } else {
+    setTimeout(() => document.getElementById('login-input').focus(), 100);
+  }
+}
+function doLogin() {
+  const input = document.getElementById('login-input').value;
+  const errEl = document.getElementById('login-error');
+  if (input === PASSWORD) {
+    sessionStorage.setItem('osteph_admin_logged', '1');
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('app').style.display = 'grid';
+    bootApp();
+  } else {
+    errEl.textContent = 'Mot de passe incorrect';
+    document.getElementById('login-input').value = '';
+    document.getElementById('login-input').focus();
+    setTimeout(() => { errEl.textContent = ''; }, 3000);
+  }
+}
+function doLogout() {
+  if (dirty && !confirm('Tu as des modifications non enregistrées. Vraiment quitter ?')) return;
+  sessionStorage.removeItem('osteph_admin_logged');
+  location.reload();
+}
+document.getElementById('login-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ==============================
+// STATE
+// ==============================
+let content = { cities: [], menu: [], schedule: [], settings: {} };
+let clients = [];
+let filteredClients = [];
+let dirty = false;
+let currentView = 'home';
+
+// ==============================
+// SIDEBAR & NAVIGATION
+// ==============================
+function toggleSidebar() {
+  const app = document.getElementById('app');
+  if (window.innerWidth <= 900) {
+    app.classList.toggle('sidebar-open');
+  } else {
+    app.classList.toggle('sidebar-collapsed');
+  }
+}
+
+document.querySelectorAll('.sidebar-item[data-view]').forEach(el => {
+  el.addEventListener('click', () => navigate(el.dataset.view));
+});
+document.querySelectorAll('.sidebar-subitem[data-view]').forEach(el => {
+  el.addEventListener('click', () => navigate(el.dataset.view));
+});
+document.querySelectorAll('.quick-card[data-view-jump]').forEach(el => {
+  el.addEventListener('click', () => navigate(el.dataset.viewJump));
+});
+document.querySelectorAll('.sidebar-item[data-toggle]').forEach(el => {
+  el.addEventListener('click', () => {
+    const key = el.dataset.toggle;
+    const submenu = document.getElementById('submenu-' + key);
+    submenu.classList.toggle('open');
+    el.classList.toggle('open');
+  });
+});
+
+const VIEW_TITLES = {
+  'home': 'Tableau de bord',
+  'cities': 'Villes (ticker)',
+  'menu': 'Menu',
+  'schedule': 'Planning & Carte',
+  'clients': 'Programme fidélité',
+  'settings-phone': 'Téléphone',
+  'settings-social': 'Réseaux sociaux',
+  'settings-tagline': 'Slogan',
+  'settings-offer': 'Offre fidélité',
+  'settings-animation': 'Animation',
+  'qr': 'Mode QR kiosque'
+};
+
+function navigate(view) {
+  currentView = view;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById('view-' + view);
+  if (target) target.classList.add('active');
+
+  // Highlight sidebar
+  document.querySelectorAll('.sidebar-item, .sidebar-subitem').forEach(el => el.classList.remove('active'));
+  const sideTarget =
+    document.querySelector(`.sidebar-item[data-view="${view}"]`) ||
+    document.querySelector(`.sidebar-subitem[data-view="${view}"]`);
+  if (sideTarget) sideTarget.classList.add('active');
+
+  // Ouvre le sous-menu parent si on est dans un sous-item
+  if (view.startsWith('settings-')) {
+    document.getElementById('submenu-settings').classList.add('open');
+    document.querySelector('[data-toggle="settings"]').classList.add('open');
+  } else if (['cities','menu','schedule'].includes(view)) {
+    document.getElementById('submenu-content').classList.add('open');
+    document.querySelector('[data-toggle="content"]').classList.add('open');
+  }
+
+  // Mise à jour breadcrumb
+  document.getElementById('crumb-view').textContent = VIEW_TITLES[view] || 'Vue';
+
+  // Fermer la sidebar sur mobile
+  if (window.innerWidth <= 900) {
+    document.getElementById('app').classList.remove('sidebar-open');
+  }
+
+  // Hash pour persistance
+  location.hash = view;
+}
+
+// ==============================
+// SAVE BUTTON
+// ==============================
+function setDirty(d) {
+  dirty = d;
+  const btn = document.getElementById('topbar-save');
+  if (d) {
+    btn.disabled = false;
+    btn.classList.add('dirty');
+    btn.innerHTML = '<span>💾</span><span class="lbl">Enregistrer</span>';
+  } else {
+    btn.disabled = true;
+    btn.classList.remove('dirty');
+    btn.innerHTML = '<span>✓</span><span class="lbl">Synchronisé</span>';
+  }
+}
+
+document.getElementById('topbar-save').addEventListener('click', async () => {
+  if (!dirty) return;
+  const btn = document.getElementById('topbar-save');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span><span class="lbl">Enregistrement…</span>';
+  try {
+    await OSTEPH.pushContent(content);
+    setDirty(false);
+    toast('Modifications enregistrées dans le cloud', 'success');
+  } catch (err) {
+    btn.innerHTML = '<span>⚠️</span><span class="lbl">Réessayer</span>';
+    btn.disabled = false;
+    toast('Erreur : ' + err.message, 'error');
+  }
+});
+
+// ==============================
+// TOASTS
+// ==============================
+function toast(msg, type) {
+  const container = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type || 'info');
+  t.textContent = msg;
+  container.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(20px)';
+    setTimeout(() => t.remove(), 300);
+  }, 3500);
+}
+
+// ==============================
+// HELPERS
+// ==============================
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ==============================
+// RENDER: CITIES
+// ==============================
+function renderCities() {
+  const wrap = document.getElementById('cities-list');
+  wrap.innerHTML = '';
+  (content.cities || []).forEach((c, i) => {
+    const pill = document.createElement('div');
+    pill.className = 'pill';
+    pill.innerHTML = `
+      <input type="text" value="${escapeHtml(c)}" placeholder="Nom de la ville">
+      <button class="btn-remove" title="Supprimer">×</button>
+    `;
+    pill.querySelector('input').oninput = e => { content.cities[i] = e.target.value; setDirty(true); };
+    pill.querySelector('.btn-remove').onclick = () => {
+      content.cities.splice(i, 1);
+      renderCities();
+      setDirty(true);
+    };
+    wrap.appendChild(pill);
+  });
+}
+document.getElementById('add-city').onclick = () => {
+  if (!content.cities) content.cities = [];
+  content.cities.push('');
+  renderCities();
+  setDirty(true);
+};
+
+// ==============================
+// RENDER: MENU
+// ==============================
+function renderMenu() {
+  const wrap = document.getElementById('menu-list');
+  wrap.innerHTML = '';
+  (content.menu || []).forEach((section, si) => {
+    const sectDiv = document.createElement('div');
+    sectDiv.className = 'menu-section';
+    sectDiv.innerHTML = `
+      <div class="menu-section-head">
+        <input type="text" class="menu-section-title" value="${escapeHtml(section.title || '')}" placeholder="Nom de la section (ex: Shawarma)">
+        <button class="btn-remove" title="Supprimer la section">×</button>
+      </div>
+      <div class="menu-items"></div>
+      <button class="btn-add add-item">+ Ajouter un plat</button>
+    `;
+    sectDiv.querySelector('.menu-section-title').oninput = e => { section.title = e.target.value; setDirty(true); };
+    sectDiv.querySelector('.btn-remove').onclick = () => {
+      if (!confirm('Supprimer la section "' + (section.title || '') + '" et tous ses plats ?')) return;
+      content.menu.splice(si, 1);
+      renderMenu();
+      setDirty(true);
+    };
+
+    const itemsDiv = sectDiv.querySelector('.menu-items');
+    (section.items || []).forEach((item, ii) => {
+      const row = document.createElement('div');
+      row.className = 'menu-item-row';
+      row.innerHTML = `
+        <input type="text" value="${escapeHtml(item.name || '')}" placeholder="Nom du plat">
+        <input type="text" class="price" value="${escapeHtml(item.price || '')}" placeholder="Prix (ex: 9,50 €)">
+        <button class="btn-remove" title="Supprimer">×</button>
+      `;
+      const inputs = row.querySelectorAll('input');
+      inputs[0].oninput = e => { item.name = e.target.value; setDirty(true); };
+      inputs[1].oninput = e => { item.price = e.target.value; setDirty(true); };
+      row.querySelector('.btn-remove').onclick = () => {
+        section.items.splice(ii, 1);
+        renderMenu();
+        setDirty(true);
+      };
+      itemsDiv.appendChild(row);
+    });
+
+    sectDiv.querySelector('.add-item').onclick = () => {
+      if (!section.items) section.items = [];
+      section.items.push({ name: '', price: '' });
+      renderMenu();
+      setDirty(true);
+    };
+
+    wrap.appendChild(sectDiv);
+  });
+}
+document.getElementById('add-section').onclick = () => {
+  if (!content.menu) content.menu = [];
+  content.menu.push({ title: '', items: [] });
+  renderMenu();
+  setDirty(true);
+};
+
+// ==============================
+// RENDER: SCHEDULE
+// ==============================
+function renderSchedule() {
+  const wrap = document.getElementById('schedule-list');
+  wrap.innerHTML = '';
+  (content.schedule || []).forEach((stop, i) => {
+    const row = document.createElement('div');
+    row.className = 'schedule-row';
+    row.innerHTML = `
+      <input type="text" class="schedule-input is-city" value="${escapeHtml(stop.city || '')}" placeholder="Ville">
+      <input type="text" class="schedule-input" value="${escapeHtml(stop.day || '')}" placeholder="Jour (Lundi soir)">
+      <input type="text" class="schedule-input" value="${escapeHtml(stop.time || '')}" placeholder="Horaires (18h-21h)">
+      <input type="text" class="schedule-input is-gps" value="${escapeHtml(stop.lat || '')}" placeholder="Latitude">
+      <input type="text" class="schedule-input is-gps" value="${escapeHtml(stop.lng || '')}" placeholder="Longitude">
+      <button class="btn-remove" title="Supprimer">×</button>
+    `;
+    const ins = row.querySelectorAll('.schedule-input');
+    ins[0].oninput = e => { stop.city = e.target.value; setDirty(true); };
+    ins[1].oninput = e => { stop.day = e.target.value; setDirty(true); };
+    ins[2].oninput = e => { stop.time = e.target.value; setDirty(true); };
+    ins[3].oninput = e => { stop.lat = e.target.value; setDirty(true); };
+    ins[4].oninput = e => { stop.lng = e.target.value; setDirty(true); };
+    row.querySelector('.btn-remove').onclick = () => {
+      content.schedule.splice(i, 1);
+      renderSchedule();
+      setDirty(true);
+    };
+    wrap.appendChild(row);
+  });
+}
+document.getElementById('add-stop').onclick = () => {
+  if (!content.schedule) content.schedule = [];
+  content.schedule.push({ city: '', day: '', time: '', lat: '', lng: '' });
+  renderSchedule();
+  setDirty(true);
+};
+
+// ==============================
+// RENDER: SETTINGS
+// ==============================
+function renderSettings() {
+  const s = content.settings || {};
+  document.querySelectorAll('[data-setting]').forEach(input => {
+    const key = input.dataset.setting;
+    const val = s[key];
+    if (input.type === 'checkbox') {
+      input.checked = !!val;
+    } else {
+      input.value = val == null ? '' : val;
+    }
+    input.oninput = () => {
+      if (!content.settings) content.settings = {};
+      if (input.type === 'checkbox') {
+        content.settings[key] = input.checked;
+      } else if (input.type === 'number') {
+        const n = parseInt(input.value, 10);
+        content.settings[key] = isNaN(n) ? 10 : n;
+      } else {
+        content.settings[key] = input.value;
+      }
+      setDirty(true);
+    };
+    input.onchange = input.oninput;
+  });
+}
+
+// ==============================
+// RENDER: STATS & CLIENTS
+// ==============================
+function renderStats() {
+  document.getElementById('stat-total').textContent = clients.length;
+  const withReward = clients.filter(c => (c.menus || 0) >= 10).length;
+  document.getElementById('stat-reward').textContent = withReward;
+
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const thisWeek = clients.filter(c => c.date && new Date(c.date) >= weekAgo).length;
+  const thisMonth = clients.filter(c => c.date && new Date(c.date) >= monthStart).length;
+  document.getElementById('stat-week').textContent = thisWeek;
+  document.getElementById('stat-month').textContent = thisMonth;
+}
+
+function renderClients() {
+  const body = document.getElementById('clients-body');
+  document.getElementById('count-badge').textContent =
+    `${filteredClients.length} client${filteredClients.length > 1 ? 's' : ''}`;
+
+  if (filteredClients.length === 0) {
+    body.innerHTML = '<div class="empty-state">Aucun client inscrit pour l\'instant.</div>';
+    return;
+  }
+
+  let html = `
+    <table class="clients-table">
       <thead>
         <tr>
           <th>N°</th>
-          <th>Prénom</th>
           <th>Nom</th>
-          <th class="hide-sm">Email</th>
-          <th>Tél.</th>
+          <th>Téléphone</th>
+          <th>Inscrit le</th>
           <th>Menus</th>
-          <th class="hide-sm">Inscrit le</th>
+          <th>Statut</th>
           <th></th>
         </tr>
       </thead>
-      <tbody id="clients-tbody">
-        <!-- rempli en JS -->
-      </tbody>
-    </table>
-  </div>
-
-  <div id="empty-msg" class="empty-state" style="display:none;">
-    Aucun client inscrit pour le moment.<br>Les inscriptions via la page fidélité apparaîtront ici.
-  </div>
-
-  <!-- Setup instructions -->
-  <details style="margin-top:30px; padding:14px; background:rgba(255,255,255,0.03); border:1px solid var(--silver-deep); border-radius:2px;">
-    <summary style="cursor:pointer; font-family:'Cinzel',serif; font-size:12px; letter-spacing:0.2em; color:var(--white);">
-      ⚙ SETUP JSONBIN (5 minutes)
-    </summary>
-    <div style="margin-top:14px; font-size:14px; line-height:1.7; color:var(--cream);">
-      <p>JSONBin est un service de stockage JSON gratuit (10 000 requêtes/mois). Sans lui, les téléphones des clients qui scannent le QR ne peuvent rien enregistrer chez toi.</p>
-
-      <p style="margin-top:14px;"><strong>1.</strong> Va sur <a href="https://jsonbin.io" target="_blank" style="color:var(--white);">jsonbin.io</a> et crée un compte gratuit (juste email + mdp).</p>
-
-      <p><strong>2.</strong> Une fois connecté, clique <em>« Create Bin »</em> en haut à droite.</p>
-
-      <p><strong>3.</strong> Dans le contenu, efface tout et remplace par juste :</p>
-      <code style="display:block; padding:8px 12px; background:var(--black); color:var(--white); border-radius:2px; margin:8px 0; font-size:14px;">[]</code>
-      <p>Donne-lui un nom genre <em>« osteph-clients »</em> et clique <em>« Create »</em>.</p>
-
-      <p><strong>4.</strong> Copie le <strong>BIN ID</strong> (visible dans l'URL de la page après création, après <code>/bin/</code> — c'est une longue chaîne de 24 caractères).</p>
-
-      <p><strong>5.</strong> Va dans le menu <em>« API Keys »</em> à gauche → copie le <strong>X-MASTER-KEY</strong> (commence par <code>$2a$10$...</code>).</p>
-
-      <p><strong>6.</strong> Reviens ici, clique <em>« ⚙ Config JSONBin »</em> en haut, colle le Bin ID + Master Key, puis <em>« Tester »</em>.</p>
-
-      <p style="margin-top:14px; font-style:italic; opacity:0.85;">À partir de là, chaque client qui scanne le QR + tape ses infos est automatiquement ajouté à ton bin, et tu peux tout voir/gérer ici. ✦</p>
-
-      <p style="margin-top:10px; font-size:12px; opacity:0.6; line-height:1.5;">
-      ⚠ Le Master Key est embarqué dans chaque QR (sinon le tel du client ne pourrait pas écrire). Quelqu'un de techniquement curieux pourrait l'extraire et écrire dans ton bin. Pour un food truck, le risque est faible. Si tu vois du spam, tu peux régénérer la clé sur jsonbin.io.
-      </p>
-    </div>
-  </details>
-
-  <div class="footer" style="margin-top:30px;">O'Steph Back Office</div>
-</div>
-
-<script src="assets/app.js"></script>
-<script>
-const ADMIN_PASSWORD = 'osteph2026'; // ← CHANGE LE MOT DE PASSE ICI
-
-// ===== Auth =====
-const loginView = document.getElementById('login-view');
-const dashView = document.getElementById('dash-view');
-
-function isAuth() {
-  return sessionStorage.getItem(OSTEPH.KEY_ADMIN_AUTH) === '1';
-}
-
-function showDash() {
-  loginView.style.display = 'none';
-  dashView.style.display = 'block';
-  refresh();
-  doSync(true); // sync auto silencieuse à l'ouverture du dashboard
-}
-
-if (isAuth()) showDash();
-
-document.getElementById('login-form').addEventListener('submit', e => {
-  e.preventDefault();
-  const pwd = document.getElementById('pwd').value;
-  if (pwd === ADMIN_PASSWORD) {
-    sessionStorage.setItem(OSTEPH.KEY_ADMIN_AUTH, '1');
-    showDash();
-  } else {
-    document.getElementById('login-error').style.display = 'block';
-  }
-});
-
-document.getElementById('logout-btn').addEventListener('click', () => {
-  sessionStorage.removeItem(OSTEPH.KEY_ADMIN_AUTH);
-  location.reload();
-});
-
-// ===== Affichage clients =====
-function refresh() {
-  const all = OSTEPH.loadClients();
-  const q = document.getElementById('search').value.trim().toLowerCase();
-  const filtered = q
-    ? all.filter(c => Object.values(c).some(v => String(v).toLowerCase().includes(q)))
-    : all;
-
-  const tbody = document.getElementById('clients-tbody');
-  const empty = document.getElementById('empty-msg');
-  tbody.innerHTML = '';
-
-  if (filtered.length === 0) {
-    empty.style.display = 'block';
-  } else {
-    empty.style.display = 'none';
-    // Plus récent en haut
-    [...filtered].reverse().forEach(c => {
-      const tr = document.createElement('tr');
-      const dateStr = new Date(c.created).toLocaleDateString('fr-FR') +
-        ' ' + new Date(c.created).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-      const dash = (v) => v && v.trim() ? escapeHtml(v) : '<span style="color:var(--silver-deep);">—</span>';
-      const sourceBadge = c.source === 'qr'
-        ? '<span style="font-size:9px; padding:2px 6px; background:rgba(255,255,255,0.08); border:1px solid var(--silver-deep); border-radius:8px; letter-spacing:0.1em; vertical-align:middle; margin-left:6px; color:var(--silver-soft);">QR</span>'
-        : '';
-      const menus = parseInt(c.menus || 0, 10);
-      // Récompense due tous les 10 menus
-      const rewardDue = menus > 0 && menus % 10 === 0;
-      const rewardBadge = rewardDue
-        ? '<span title="Récompense disponible !" style="margin-left:6px; font-size:14px;">🎁</span>'
-        : '';
-      tr.innerHTML = `
-        <td class="num">${c.number}${sourceBadge}</td>
-        <td>${dash(c.prenom)}</td>
-        <td>${dash(c.nom)}</td>
-        <td class="hide-sm">${dash(c.email)}</td>
-        <td>${dash(c.telephone)}</td>
-        <td class="menus-cell">
-          <div class="menus-control">
-            <button class="menu-btn minus" data-num="${c.number}" data-action="dec" title="Retirer 1 menu">−</button>
-            <span class="menus-count ${rewardDue ? 'reward-due' : ''}">${menus}</span>
-            <button class="menu-btn plus" data-num="${c.number}" data-action="inc" title="Ajouter 1 menu">+</button>
-            ${rewardBadge}
+      <tbody>
+  `;
+  filteredClients.forEach(c => {
+    const menus = c.menus || 0;
+    const pct = Math.min(100, (menus / 10) * 100);
+    const hasReward = menus >= 10;
+    const date = c.date ? new Date(c.date).toLocaleDateString('fr-FR') : '—';
+    html += `
+      <tr>
+        <td><span class="num-badge">#${escapeHtml(c.num || '?')}</span></td>
+        <td><strong>${escapeHtml(c.prenom || '')} ${escapeHtml(c.nom || '')}</strong></td>
+        <td>${escapeHtml(c.tel || '—')}</td>
+        <td>${date}</td>
+        <td>
+          <div class="visits-cell">
+            <div class="visits-bar"><div class="visits-bar-fill" style="width:${pct}%"></div></div>
+            <span class="visits-num">${menus}</span>
           </div>
         </td>
-        <td class="hide-sm">${dateStr}</td>
-        <td><button class="del-btn" data-num="${c.number}">Supprimer</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  // Stats
-  updateStatsOnly(all);
-
-  // ===== Bind +/- menus avec debounce et feedback visuel =====
-  // On regroupe les clics rapides (genre +5 d'un coup) en un seul push cloud
-  const pendingPushes = {};
-  function scheduleCloudPush(num, cell) {
-    clearTimeout(pendingPushes[num]);
-    pendingPushes[num] = setTimeout(async () => {
-      delete pendingPushes[num];
-      if (!OSTEPH.isCloudConfigured()) {
-        cell.classList.add('saved-local');
-        setTimeout(() => cell.classList.remove('saved-local'), 1500);
-        return;
-      }
-      cell.classList.add('saving');
-      try {
-        await OSTEPH.cloudPush(OSTEPH.loadClients());
-        cell.classList.remove('saving');
-        cell.classList.add('saved');
-        setTimeout(() => cell.classList.remove('saved'), 1500);
-        const time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-        setSyncStatus(`✓ Sauvegardé dans le cloud · ${time}`);
-      } catch (err) {
-        cell.classList.remove('saving');
-        cell.classList.add('save-error');
-        setTimeout(() => cell.classList.remove('save-error'), 2500);
-        setSyncStatus('⚠ Erreur sync — réessayez');
-      }
-    }, 700); // 700ms après le dernier clic on push
-  }
-
-  tbody.querySelectorAll('.menu-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const num = btn.dataset.num;
-      const action = btn.dataset.action;
-      const all = OSTEPH.loadClients();
-      const idx = all.findIndex(c => c.number === num);
-      if (idx === -1) return;
-
-      const current = parseInt(all[idx].menus || 0, 10);
-      const next = action === 'inc' ? current + 1 : Math.max(0, current - 1);
-      all[idx].menus = next;
-      all[idx].last_visit = new Date().toISOString();
-      OSTEPH.saveClients(all);
-
-      // Mise à jour immédiate du compteur sans full refresh (perf + pas de flicker)
-      const tr = btn.closest('tr');
-      const countEl = tr.querySelector('.menus-count');
-      const cell = tr.querySelector('.menus-cell');
-      if (countEl) {
-        countEl.textContent = next;
-        // Toggle reward state
-        const rewardDue = next > 0 && next % 10 === 0;
-        countEl.classList.toggle('reward-due', rewardDue);
-        // Animation pulse au clic
-        countEl.classList.remove('pulse');
-        void countEl.offsetWidth; // reflow pour relancer l'anim
-        countEl.classList.add('pulse');
-      }
-      // Refresh stats globales (sans toucher au DOM des lignes)
-      updateStatsOnly(all);
-
-      // Schedule cloud push (debounced)
-      scheduleCloudPush(num, cell);
-    });
+        <td>${hasReward ? '<span class="reward-badge">🎁 Offert</span>' : '<span style="color:var(--text-dim);font-style:italic;font-size:13px">En cours</span>'}</td>
+        <td><button class="btn btn-danger" onclick="deleteClient('${escapeHtml(c.num || '')}')">Suppr</button></td>
+      </tr>
+    `;
   });
-
-  // Bind suppression
-  tbody.querySelectorAll('.del-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const num = btn.dataset.num;
-      if (!confirm(`Supprimer définitivement le client ${num} ?`)) return;
-
-      // 1. Suppression locale immédiate (UX instantanée)
-      OSTEPH.removeClient(num);
-      refresh();
-
-      // 2. Si cloud configuré, on push la nouvelle liste
-      if (OSTEPH.isCloudConfigured()) {
-        setSyncStatus('Suppression dans le cloud…');
-        try {
-          await OSTEPH.cloudPush(OSTEPH.loadClients());
-          setSyncStatus('✓ Supprimé du cloud · ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}));
-        } catch (err) {
-          setSyncStatus('⚠ Erreur cloud — re-synchronise pour annuler');
-        }
-      }
-    });
-  });
+  html += '</tbody></table>';
+  body.innerHTML = html;
 }
 
-function updateStatsOnly(all) {
-  document.getElementById('stat-total').textContent = all.length;
-  const today = new Date().toDateString();
-  const thisMonth = new Date().toISOString().slice(0,7);
-  document.getElementById('stat-today').textContent =
-    all.filter(c => new Date(c.created).toDateString() === today).length;
-  document.getElementById('stat-month').textContent =
-    all.filter(c => c.created.slice(0,7) === thisMonth).length;
-  const totalMenus = all.reduce((sum, c) => sum + parseInt(c.menus || 0, 10), 0);
-  const rewardsDue = all.filter(c => {
-    const m = parseInt(c.menus || 0, 10);
-    return m > 0 && m % 10 === 0;
-  }).length;
-  document.getElementById('stat-menus').textContent = totalMenus;
-  document.getElementById('stat-rewards').textContent = rewardsDue;
-}
-
-function escapeHtml(s) {
-  return String(s || '').replace(/[&<>"']/g, m =>
-    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-
-// ===== Sync status helper =====
-function setSyncStatus(msg) {
-  document.getElementById('sync-status').textContent = msg || '';
-}
-
-// ===== Sync depuis le cloud =====
-async function doSync(silent = false) {
-  if (!OSTEPH.isCloudConfigured()) {
-    if (!silent) alert('Configure d\'abord JSONBin via ⚙ Config JSONBin');
-    setSyncStatus('⚠ JSONBin non configuré · les inscriptions QR ne seront pas reçues');
-    return;
+document.getElementById('search-input').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  if (!q) {
+    filteredClients = clients;
+  } else {
+    filteredClients = clients.filter(c =>
+      (c.prenom || '').toLowerCase().includes(q) ||
+      (c.nom || '').toLowerCase().includes(q) ||
+      (c.tel || '').includes(q) ||
+      String(c.num || '').includes(q)
+    );
   }
-  setSyncStatus('Synchronisation…');
+  renderClients();
+});
+
+async function deleteClient(num) {
+  if (!confirm('Supprimer définitivement ce client ?')) return;
+  clients = clients.filter(c => String(c.num) !== String(num));
+  filteredClients = filteredClients.filter(c => String(c.num) !== String(num));
   try {
-    const count = await OSTEPH.syncFromCloud();
-    refresh();
-    const time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-    setSyncStatus(`✓ Synchronisé · ${count} clients · ${time}`);
+    if (typeof OSTEPH !== 'undefined' && OSTEPH.pushClients) {
+      await OSTEPH.pushClients(clients);
+    }
+    toast('Client supprimé', 'success');
+  } catch (e) {
+    toast('Erreur : ' + e.message, 'error');
+  }
+  renderStats();
+  renderClients();
+}
+
+function exportCSV() {
+  if (!clients.length) {
+    toast('Aucun client à exporter', 'info');
+    return;
+  }
+  const headers = ['N°', 'Prénom', 'Nom', 'Téléphone', 'Date inscription', 'Menus', 'Récompense'];
+  const rows = clients.map(c => [
+    c.num || '', c.prenom || '', c.nom || '', c.tel || '',
+    c.date || '', c.menus || 0,
+    (c.menus || 0) >= 10 ? 'OUI' : 'NON'
+  ]);
+  const csv = [headers, ...rows].map(r =>
+    r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `osteph_clients_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`${clients.length} clients exportés`, 'success');
+}
+
+// ==============================
+// GLOBAL SEARCH
+// ==============================
+document.getElementById('global-search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  if (q.length < 2) return;
+
+  // Si on est dans la vue clients, filtre directement
+  if (currentView === 'clients') {
+    document.getElementById('search-input').value = q;
+    document.getElementById('search-input').dispatchEvent(new Event('input'));
+  }
+});
+
+// ==============================
+// BOOT
+// ==============================
+async function bootApp() {
+  // Date affichage
+  const sub = document.getElementById('home-subtitle');
+  const now = new Date();
+  const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  sub.textContent = `Bienvenue Stéphanie · ${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]}`;
+
+  // Restaurer la vue depuis le hash
+  const hash = location.hash.replace('#', '');
+  if (hash && VIEW_TITLES[hash]) {
+    navigate(hash);
+  }
+
+  // Chargement contenu cloud
+  try {
+    content = await OSTEPH.fetchContent(true);
+    content.cities = content.cities || [];
+    content.menu = content.menu || [];
+    content.schedule = content.schedule || [];
+    content.settings = content.settings || (OSTEPH._defaultSettings ? OSTEPH._defaultSettings() : {});
+    renderCities();
+    renderMenu();
+    renderSchedule();
+    renderSettings();
   } catch (err) {
-    setSyncStatus('⚠ Erreur synchro : ' + (err.message || 'inconnue'));
-    if (!silent) alert('Synchro échouée : ' + err.message);
+    toast('Erreur de chargement contenu : ' + err.message, 'error');
+  }
+
+  // Chargement clients
+  try {
+    if (typeof OSTEPH !== 'undefined' && OSTEPH.fetchClients) {
+      clients = await OSTEPH.fetchClients();
+    } else {
+      clients = [];
+    }
+    filteredClients = clients;
+    renderStats();
+    renderClients();
+  } catch (e) {
+    console.error(e);
+    clients = [];
+    filteredClients = [];
+    renderStats();
+    renderClients();
   }
 }
 
-// Bouton sync manuel (l'auto-sync se fait dans showDash())
-document.getElementById('sync-btn').addEventListener('click', () => doSync(false));
-
-// ===== Toolbar =====
-document.getElementById('search').addEventListener('input', refresh);
-
-document.getElementById('export-btn').addEventListener('click', () => {
-  if (OSTEPH.loadClients().length === 0) {
-    alert('Aucun client à exporter.');
-    return;
-  }
-  OSTEPH.exportCSV();
-});
-
-document.getElementById('clear-btn').addEventListener('click', () => {
-  if (OSTEPH.loadClients().length === 0) {
-    alert('Aucun client à effacer.');
-    return;
-  }
-  if (confirm('⚠ Cela efface uniquement la copie LOCALE. Le cloud n\'est PAS touché. Continuer ?')) {
-    OSTEPH.clearAll();
-    refresh();
-    setSyncStatus('Cache local vidé · clique « Synchroniser » pour recharger depuis le cloud');
+// Avertissement si quitte avec modifs non sauvées
+window.addEventListener('beforeunload', e => {
+  if (dirty) {
+    e.preventDefault();
+    e.returnValue = '';
   }
 });
 
-// ===== Config JSONBin =====
-const cfgPanel = document.getElementById('config-panel');
-const binIdInput = document.getElementById('bin-id');
-const binKeyInput = document.getElementById('bin-key');
-
-document.getElementById('config-btn').addEventListener('click', () => {
-  const cfg = OSTEPH.cloudConfig();
-  binIdInput.value = cfg.id || '';
-  binKeyInput.value = cfg.key || '';
-  cfgPanel.style.display = cfgPanel.style.display === 'none' ? 'block' : 'none';
-});
-
-document.getElementById('close-config').addEventListener('click', () => {
-  cfgPanel.style.display = 'none';
-});
-
-document.getElementById('save-bin').addEventListener('click', () => {
-  OSTEPH.setCloudConfig(binIdInput.value, binKeyInput.value);
-  alert('Configuration enregistrée. Les prochains scans QR enverront les données dans ton bin.');
-  cfgPanel.style.display = 'none';
-  doSync(true);
-});
-
-document.getElementById('test-bin').addEventListener('click', async () => {
-  // Sauvegarde temporaire pour tester
-  OSTEPH.setCloudConfig(binIdInput.value, binKeyInput.value);
-  setSyncStatus('Test en cours…');
-  try {
-    const arr = await OSTEPH.cloudFetch();
-    alert('✓ Connexion réussie ! ' + arr.length + ' enregistrement(s) dans le bin.');
-    setSyncStatus('✓ Connexion OK · ' + arr.length + ' clients dans le bin');
-  } catch (err) {
-    alert('✗ Erreur : ' + err.message + '\n\nVérifie le Bin ID et le Master Key.');
-    setSyncStatus('⚠ Test échoué : ' + err.message);
-  }
-});
+// Init
+checkLogin();
 </script>
 </body>
 </html>
