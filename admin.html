@@ -39,7 +39,7 @@
   </form>
 
   <div class="footer">
-    <a href="https://osteph.fr/" target="_blank">→ Voir le site public</a>
+    <a href="https://xtimerpro-cmyk.github.io/osteph/" target="_blank">→ Voir le site public</a>
   </div>
 </div>
 
@@ -75,7 +75,6 @@
     <input type="search" id="search" placeholder="Rechercher (nom, tel, n°…)">
     <button class="btn btn-sm" id="sync-btn">⟳ Synchroniser</button>
     <a href="qr.html" class="btn btn-sm" target="_blank" style="text-decoration:none;">📱 Mode QR</a>
-    <a href="content.html" class="btn btn-sm" style="text-decoration:none; border-color:#cfbb8f; color:#ede0bf;">✏ Édition contenu</a>
     <button class="btn btn-sm" id="export-btn">Export CSV</button>
     <button class="btn btn-sm" id="config-btn">⚙ Config JSONBin</button>
     <button class="btn btn-sm" id="clear-btn" style="border-color:#6b1f1f; color:#d49696;">Tout effacer (local)</button>
@@ -234,9 +233,8 @@ function refresh() {
         <td class="menus-cell">
           <div class="menus-control">
             <button class="menu-btn minus" data-num="${c.number}" data-action="dec" title="Retirer 1 menu">−</button>
-            <span class="menus-count ${rewardDue ? 'reward-due' : ''}" data-num="${c.number}">${menus}</span>
+            <span class="menus-count ${rewardDue ? 'reward-due' : ''}">${menus}</span>
             <button class="menu-btn plus" data-num="${c.number}" data-action="inc" title="Ajouter 1 menu">+</button>
-            <button class="save-btn" data-num="${c.number}" title="Sauvegarder dans le cloud">Save</button>
             ${rewardBadge}
           </div>
         </td>
@@ -250,13 +248,33 @@ function refresh() {
   // Stats
   updateStatsOnly(all);
 
-  // ===== +/- : modifient localement, Save = push cloud =====
-  // Ligne marquée "dirty" tant que pas sauvée → bouton Save vire orange/pulse
-  function markDirty(tr, isDirty) {
-    const cell = tr.querySelector('.menus-cell');
-    const saveBtn = tr.querySelector('.save-btn');
-    if (cell) cell.classList.toggle('dirty', isDirty);
-    if (saveBtn) saveBtn.classList.toggle('dirty', isDirty);
+  // ===== Bind +/- menus avec debounce et feedback visuel =====
+  // On regroupe les clics rapides (genre +5 d'un coup) en un seul push cloud
+  const pendingPushes = {};
+  function scheduleCloudPush(num, cell) {
+    clearTimeout(pendingPushes[num]);
+    pendingPushes[num] = setTimeout(async () => {
+      delete pendingPushes[num];
+      if (!OSTEPH.isCloudConfigured()) {
+        cell.classList.add('saved-local');
+        setTimeout(() => cell.classList.remove('saved-local'), 1500);
+        return;
+      }
+      cell.classList.add('saving');
+      try {
+        await OSTEPH.cloudPush(OSTEPH.loadClients());
+        cell.classList.remove('saving');
+        cell.classList.add('saved');
+        setTimeout(() => cell.classList.remove('saved'), 1500);
+        const time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+        setSyncStatus(`✓ Sauvegardé dans le cloud · ${time}`);
+      } catch (err) {
+        cell.classList.remove('saving');
+        cell.classList.add('save-error');
+        setTimeout(() => cell.classList.remove('save-error'), 2500);
+        setSyncStatus('⚠ Erreur sync — réessayez');
+      }
+    }, 700); // 700ms après le dernier clic on push
   }
 
   tbody.querySelectorAll('.menu-btn').forEach(btn => {
@@ -273,57 +291,25 @@ function refresh() {
       all[idx].last_visit = new Date().toISOString();
       OSTEPH.saveClients(all);
 
-      // Update DOM sans full refresh
+      // Mise à jour immédiate du compteur sans full refresh (perf + pas de flicker)
       const tr = btn.closest('tr');
       const countEl = tr.querySelector('.menus-count');
+      const cell = tr.querySelector('.menus-cell');
       if (countEl) {
         countEl.textContent = next;
+        // Toggle reward state
         const rewardDue = next > 0 && next % 10 === 0;
         countEl.classList.toggle('reward-due', rewardDue);
+        // Animation pulse au clic
         countEl.classList.remove('pulse');
-        void countEl.offsetWidth;
+        void countEl.offsetWidth; // reflow pour relancer l'anim
         countEl.classList.add('pulse');
       }
+      // Refresh stats globales (sans toucher au DOM des lignes)
       updateStatsOnly(all);
 
-      // Marque la ligne comme "non sauvée"
-      markDirty(tr, true);
-    });
-  });
-
-  // Bouton Save : pousse explicitement vers JSONBin
-  tbody.querySelectorAll('.save-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const num = btn.dataset.num;
-      const tr = btn.closest('tr');
-      const cell = tr.querySelector('.menus-cell');
-
-      if (!OSTEPH.isCloudConfigured()) {
-        cell.classList.add('saved-local');
-        markDirty(tr, false);
-        setTimeout(() => cell.classList.remove('saved-local'), 1800);
-        setSyncStatus('⚠ JSONBin non configuré — sauvegardé en local uniquement');
-        return;
-      }
-
-      btn.disabled = true;
-      cell.classList.add('saving');
-      try {
-        await OSTEPH.cloudPush(OSTEPH.loadClients());
-        cell.classList.remove('saving');
-        cell.classList.add('saved');
-        markDirty(tr, false);
-        setTimeout(() => cell.classList.remove('saved'), 1800);
-        const time = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-        setSyncStatus(`✓ Client ${num} sauvegardé dans le cloud · ${time}`);
-      } catch (err) {
-        cell.classList.remove('saving');
-        cell.classList.add('save-error');
-        setTimeout(() => cell.classList.remove('save-error'), 2500);
-        setSyncStatus('⚠ Erreur de sauvegarde — réessayez');
-      } finally {
-        btn.disabled = false;
-      }
+      // Schedule cloud push (debounced)
+      scheduleCloudPush(num, cell);
     });
   });
 
