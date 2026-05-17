@@ -52,15 +52,16 @@ const OSTEPH = {
 
   _normalizeRecord(record) {
     if (Array.isArray(record)) {
-      return { clients: record, content: this._defaultContent() };
+      return { clients: record, orders: [], content: this._defaultContent() };
     }
     if (typeof record === 'object' && record !== null) {
       return {
         clients: Array.isArray(record.clients) ? record.clients : [],
+        orders: Array.isArray(record.orders) ? record.orders : [],
         content: this._normalizeContent(record.content)
       };
     }
-    return { clients: [], content: this._defaultContent() };
+    return { clients: [], orders: [], content: this._defaultContent() };
   },
 
   _normalizeContent(content) {
@@ -68,6 +69,10 @@ const OSTEPH = {
     return {
       cities: Array.isArray(content.cities) ? content.cities : [],
       menu: Array.isArray(content.menu) ? content.menu : [],
+      sauces: Array.isArray(content.sauces) ? content.sauces : [],
+      extras: Array.isArray(content.extras) ? content.extras : [],
+      formulas: Array.isArray(content.formulas) ? content.formulas : [],
+      drinks: Array.isArray(content.drinks) ? content.drinks : [],
       schedule: Array.isArray(content.schedule) ? content.schedule : this._defaultSchedule(),
       settings: this._normalizeSettings(content.settings)
     };
@@ -160,6 +165,38 @@ const OSTEPH = {
         }
       ],
       schedule: this._defaultSchedule(),
+      sauces: [
+        { name: 'Algérienne', price: '', outOfStock: false },
+        { name: 'Samouraï', price: '', outOfStock: false },
+        { name: 'Blanche', price: '', outOfStock: false },
+        { name: 'Andalouse', price: '', outOfStock: false },
+        { name: 'Harissa', price: '', outOfStock: false },
+        { name: 'Curry', price: '', outOfStock: false },
+        { name: 'Barbecue', price: '', outOfStock: false },
+        { name: 'Ketchup', price: '', outOfStock: false },
+        { name: 'Mayonnaise', price: '', outOfStock: false }
+      ],
+      extras: [
+        { name: 'Cheddar', price: '1,00 €', outOfStock: false },
+        { name: 'Double viande', price: '3,00 €', outOfStock: false },
+        { name: 'Œuf', price: '1,00 €', outOfStock: false },
+        { name: 'Oignons frits', price: '0,50 €', outOfStock: false },
+        { name: 'Bacon', price: '1,50 €', outOfStock: false },
+        { name: 'Supplément frites', price: '2,50 €', outOfStock: false }
+      ],
+      formulas: [
+        { name: "Menu O'Class", composition: "Shawarma O'Class + Frites + Boisson 33cl", price: '12,00 €' },
+        { name: "Menu O'Gyros", composition: "Gyros au choix + Frites + Boisson 33cl", price: '12,50 €' }
+      ],
+      drinks: [
+        { name: 'Coca-Cola', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Coca-Cola Zéro', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Fanta Orange', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Sprite', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Ice Tea', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Orangina', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Eau plate', size: '50cl', price: '1,50 €', outOfStock: false }
+      ],
       settings: this._defaultSettings()
     };
   },
@@ -195,7 +232,7 @@ const OSTEPH = {
   async cloudPush(arr) {
     let rec;
     try { rec = await this._cloudFetchRaw(); }
-    catch (e) { rec = { clients: [], content: this._defaultContent() }; }
+    catch (e) { rec = { clients: [], orders: [], content: this._defaultContent() }; }
     rec.clients = Array.isArray(arr) ? arr : [];
     return await this._cloudPushRaw(rec);
   },
@@ -241,12 +278,89 @@ const OSTEPH = {
   async pushContent(content) {
     let rec;
     try { rec = await this._cloudFetchRaw(); }
-    catch (e) { rec = { clients: [], content: this._defaultContent() }; }
+    catch (e) { rec = { clients: [], orders: [], content: this._defaultContent() }; }
     rec.content = this._normalizeContent(content);
     await this._cloudPushRaw(rec);
     localStorage.removeItem(this.KEY_CONTENT_CACHED_AT);
     localStorage.setItem(this.KEY_CONTENT_CACHE, JSON.stringify(rec.content));
     return true;
+  },
+
+  // ============== CLIENTS (alias) ==============
+  async fetchClients() {
+    try {
+      const rec = await this._cloudFetchRaw();
+      this.saveClients(rec.clients);
+      return rec.clients;
+    } catch (e) {
+      return this.loadClients();
+    }
+  },
+
+  async pushClients(arr) {
+    let rec;
+    try { rec = await this._cloudFetchRaw(); }
+    catch (e) { rec = { clients: [], orders: [], content: this._defaultContent() }; }
+    rec.clients = Array.isArray(arr) ? arr : [];
+    await this._cloudPushRaw(rec);
+    this.saveClients(rec.clients);
+    return true;
+  },
+
+  // ============== ORDERS ==============
+  async fetchOrders(forceRefresh = false) {
+    try {
+      const rec = await this._cloudFetchRaw();
+      return rec.orders || [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  async pushOrders(arr) {
+    let rec;
+    try { rec = await this._cloudFetchRaw(); }
+    catch (e) { rec = { clients: [], orders: [], content: this._defaultContent() }; }
+    rec.orders = Array.isArray(arr) ? arr : [];
+    await this._cloudPushRaw(rec);
+    return true;
+  },
+
+  // Soumission d'une commande depuis le chatbot WhatsApp côté site public
+  // Cette méthode :
+  // 1. Fetch le record actuel
+  // 2. Ajoute la commande à la liste orders
+  // 3. Push le record mis à jour
+  // 4. Renvoie le numéro de commande
+  async submitOrder(orderData) {
+    try {
+      const rec = await this._cloudFetchRaw();
+      if (!Array.isArray(rec.orders)) rec.orders = [];
+
+      const year = new Date().getFullYear();
+      // Trouver le prochain numéro
+      const existingNums = rec.orders
+        .map(o => parseInt(String(o.num || '').replace(/[^0-9]/g, ''), 10))
+        .filter(n => !isNaN(n));
+      const nextN = (existingNums.length ? Math.max(...existingNums) : 0) + 1;
+      const orderNum = `CMD-${year}-${String(nextN).padStart(4, '0')}`;
+
+      const order = {
+        num: orderNum,
+        date: new Date().toISOString(),
+        name: orderData.name || '',
+        phone: orderData.phone || '',
+        items: orderData.items || '',
+        total: orderData.total || '',
+        notes: orderData.notes || ''
+      };
+      rec.orders.push(order);
+      await this._cloudPushRaw(rec);
+      return orderNum;
+    } catch (e) {
+      console.warn('submitOrder failed:', e);
+      throw e;
+    }
   },
 
   loadClients() {

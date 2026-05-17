@@ -1101,6 +1101,56 @@
     .sauce-row .btn-remove { grid-column: span 2; justify-self: end; }
   }
 
+  /* DRINKS */
+  .drink-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr auto 30px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(207, 187, 143, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: opacity 0.2s;
+  }
+  .drink-row.item-oos {
+    opacity: 0.5;
+    background: rgba(248, 113, 113, 0.05);
+    border-color: rgba(248, 113, 113, 0.3);
+  }
+  .drink-row.item-oos input[type="text"] {
+    text-decoration: line-through;
+    color: var(--text-faint);
+  }
+  .drink-row input[type="text"] {
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+  }
+  .drink-row input[type="text"]:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .drink-row input.price {
+    text-align: right;
+    color: var(--gold-readable);
+    font-weight: 500;
+  }
+  @media (max-width: 700px) {
+    .drink-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .drink-row .tag-chk { grid-column: span 2; justify-content: center; }
+    .drink-row .btn-remove { grid-column: span 2; justify-self: end; }
+  }
+
   /* ========================= FORMULAS ========================= */
   .formula-row {
     background: linear-gradient(165deg,
@@ -1445,10 +1495,16 @@
         <a class="sidebar-subitem" data-view="sauces">Sauces</a>
         <a class="sidebar-subitem" data-view="extras">Suppléments</a>
         <a class="sidebar-subitem" data-view="formulas">Formules</a>
+        <a class="sidebar-subitem" data-view="drinks">Boissons</a>
         <a class="sidebar-subitem" data-view="schedule">Planning & Carte</a>
       </div>
 
-      <div class="sidebar-section">Clients</div>
+      <div class="sidebar-section">Activité</div>
+      <div class="sidebar-item" data-view="orders">
+        <span class="icon">📦</span>
+        <span class="label">Commandes</span>
+        <span class="badge-new" id="orders-badge" style="display:none;background:#f87171;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:10px;padding:2px 8px;border-radius:10px;letter-spacing:0.06em;margin-left:auto;">0</span>
+      </div>
       <div class="sidebar-item" data-view="clients">
         <span class="icon">👥</span>
         <span class="label">Programme fidélité</span>
@@ -1670,6 +1726,26 @@
       </div>
     </section>
 
+    <!-- ====== VIEW: DRINKS ====== -->
+    <section class="view" id="view-drinks">
+      <div class="view-header">
+        <div class="view-title">Boissons</div>
+        <div class="view-subtitle">Boissons proposées à la vente</div>
+      </div>
+      <div class="help-block">
+        Liste toutes les <strong>boissons disponibles</strong> au camion : sodas, eaux, jus, boissons chaudes…<br>
+        Pour chacune : <strong>nom</strong>, <strong>contenance</strong> (33cl, 50cl, etc.) optionnelle et <strong>prix</strong>.
+        Marque <strong>en rupture</strong> pour cacher temporairement.
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="ico">🥤</span> Boissons</div>
+        </div>
+        <div id="drinks-list"></div>
+        <button class="btn-add" id="add-drink">+ Ajouter une boisson</button>
+      </div>
+    </section>
+
     <!-- ====== VIEW: SCHEDULE ====== -->
     <section class="view" id="view-schedule">
       <div class="view-header">
@@ -1705,6 +1781,52 @@
       </div>
 
       <div id="clients-body"></div>
+    </section>
+
+    <!-- ====== VIEW: ORDERS ====== -->
+    <section class="view" id="view-orders">
+      <div class="view-header">
+        <div class="view-title">Commandes</div>
+        <div class="view-subtitle">Toutes les commandes WhatsApp reçues via le site</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrap">📦</div>
+          <div class="stat-label">Total commandes</div>
+          <div class="stat-value" id="ord-total">0</div>
+          <div class="stat-foot">Depuis le début</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon-wrap">📅</div>
+          <div class="stat-label">Aujourd'hui</div>
+          <div class="stat-value" id="ord-today">0</div>
+          <div class="stat-foot">Commandes du jour</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon-wrap">📈</div>
+          <div class="stat-label">Cette semaine</div>
+          <div class="stat-value" id="ord-week">0</div>
+          <div class="stat-foot">7 derniers jours</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon-wrap">💶</div>
+          <div class="stat-label">Panier moyen</div>
+          <div class="stat-value" id="ord-avg">0 €</div>
+          <div class="stat-foot">Toutes commandes</div>
+        </div>
+      </div>
+
+      <div class="clients-toolbar">
+        <span class="clients-count" id="orders-count">0 commandes</span>
+        <div class="clients-search">
+          <span class="topbar-search-icon">🔍</span>
+          <input type="text" class="topbar-search-input" id="orders-search" placeholder="Rechercher (nom, plat, tel…)">
+        </div>
+        <button class="btn" onclick="exportOrdersCSV()">↓ Export CSV</button>
+      </div>
+
+      <div id="orders-body"></div>
     </section>
 
     <!-- ====== SETTINGS: PHONE ====== -->
@@ -1925,6 +2047,10 @@ document.getElementById('login-input').addEventListener('keydown', e => {
 let content = { cities: [], menu: [], schedule: [], settings: {} };
 let clients = [];
 let filteredClients = [];
+let orders = [];
+let filteredOrders = [];
+let lastOrderCount = 0;
+let ordersPollInterval = null;
 let dirty = false;
 let currentView = 'home';
 
@@ -1965,8 +2091,10 @@ const VIEW_TITLES = {
   'sauces': 'Sauces',
   'extras': 'Suppléments',
   'formulas': 'Formules & Menus',
+  'drinks': 'Boissons',
   'schedule': 'Planning & Carte',
   'clients': 'Programme fidélité',
+  'orders': 'Commandes',
   'settings-phone': 'Téléphone',
   'settings-social': 'Réseaux sociaux',
   'settings-tagline': 'Slogan',
@@ -1993,13 +2121,18 @@ function navigate(view) {
   if (view.startsWith('settings-')) {
     document.getElementById('submenu-settings').classList.add('open');
     document.querySelector('[data-toggle="settings"]').classList.add('open');
-  } else if (['cities','menu','sauces','extras','formulas','schedule'].includes(view)) {
+  } else if (['cities','menu','sauces','extras','formulas','drinks','schedule'].includes(view)) {
     document.getElementById('submenu-content').classList.add('open');
     document.querySelector('[data-toggle="content"]').classList.add('open');
   }
 
   // Mise à jour breadcrumb
   document.getElementById('crumb-view').textContent = VIEW_TITLES[view] || 'Vue';
+
+  // Marquer comme vues quand on visite l'onglet Commandes
+  if (view === 'orders' && typeof markOrdersSeen === 'function') {
+    markOrdersSeen();
+  }
 
   // Fermer la sidebar sur mobile
   if (window.innerWidth <= 900) {
@@ -2126,7 +2259,6 @@ function renderMenu() {
     (section.items || []).forEach((item, ii) => {
       const row = document.createElement('div');
       row.className = 'menu-item-card';
-      const tags = item.tags || {};
       row.innerHTML = `
         <div class="menu-item-row">
           <input type="text" value="${escapeHtml(item.name || '')}" placeholder="Nom du plat">
@@ -2135,11 +2267,7 @@ function renderMenu() {
         </div>
         <input type="text" class="menu-item-desc" value="${escapeHtml(item.description || '')}" placeholder="Description (ex: viande de bœuf, salade, tomates, oignons)">
         <div class="menu-item-tags">
-          <label class="tag-chk"><input type="checkbox" data-tag="spicy" ${tags.spicy ? 'checked' : ''}> 🌶️ Piquant</label>
-          <label class="tag-chk"><input type="checkbox" data-tag="veggie" ${tags.veggie ? 'checked' : ''}> 🥬 Végé</label>
-          <label class="tag-chk"><input type="checkbox" data-tag="bestseller" ${tags.bestseller ? 'checked' : ''}> ⭐ Best-seller</label>
-          <label class="tag-chk"><input type="checkbox" data-tag="new" ${tags.new ? 'checked' : ''}> ✨ Nouveau</label>
-          <label class="tag-chk tag-oos"><input type="checkbox" data-out-of-stock ${item.outOfStock ? 'checked' : ''}> 🚫 En rupture</label>
+          <label class="tag-chk tag-oos"><input type="checkbox" data-out-of-stock ${item.outOfStock ? 'checked' : ''}> 🚫 En rupture (caché du menu temporairement)</label>
         </div>
       `;
       const inputs = row.querySelectorAll('.menu-item-row input');
@@ -2151,14 +2279,6 @@ function renderMenu() {
         setDirty(true);
       };
       row.querySelector('.menu-item-desc').oninput = e => { item.description = e.target.value; setDirty(true); };
-      // Tags
-      row.querySelectorAll('[data-tag]').forEach(chk => {
-        chk.onchange = () => {
-          if (!item.tags) item.tags = {};
-          item.tags[chk.dataset.tag] = chk.checked;
-          setDirty(true);
-        };
-      });
       // Rupture
       const oosChk = row.querySelector('[data-out-of-stock]');
       oosChk.onchange = () => {
@@ -2173,7 +2293,7 @@ function renderMenu() {
 
     sectDiv.querySelector('.add-item').onclick = () => {
       if (!section.items) section.items = [];
-      section.items.push({ name: '', price: '', description: '', tags: {}, outOfStock: false });
+      section.items.push({ name: '', price: '', description: '', outOfStock: false });
       renderMenu();
       setDirty(true);
     };
@@ -2297,6 +2417,46 @@ document.getElementById('add-formula').onclick = () => {
   if (!content.formulas) content.formulas = [];
   content.formulas.push({ name: '', composition: '', price: '' });
   renderFormulas(); setDirty(true);
+};
+
+// ==============================
+// RENDER: DRINKS
+// ==============================
+function renderDrinks() {
+  const wrap = document.getElementById('drinks-list');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  (content.drinks || []).forEach((d, i) => {
+    const row = document.createElement('div');
+    row.className = 'drink-row';
+    if (d.outOfStock) row.classList.add('item-oos');
+    row.innerHTML = `
+      <input type="text" value="${escapeHtml(d.name || '')}" placeholder="Nom (ex: Coca-Cola)">
+      <input type="text" value="${escapeHtml(d.size || '')}" placeholder="Contenance (33cl)">
+      <input type="text" class="price" value="${escapeHtml(d.price || '')}" placeholder="Prix (2,00 €)">
+      <label class="tag-chk tag-oos"><input type="checkbox" ${d.outOfStock ? 'checked' : ''}> 🚫 Rupture</label>
+      <button class="btn-remove" title="Supprimer">×</button>
+    `;
+    const inputs = row.querySelectorAll('input');
+    inputs[0].oninput = e => { d.name = e.target.value; setDirty(true); };
+    inputs[1].oninput = e => { d.size = e.target.value; setDirty(true); };
+    inputs[2].oninput = e => { d.price = e.target.value; setDirty(true); };
+    inputs[3].onchange = e => {
+      d.outOfStock = e.target.checked;
+      row.classList.toggle('item-oos', e.target.checked);
+      setDirty(true);
+    };
+    row.querySelector('.btn-remove').onclick = () => {
+      content.drinks.splice(i, 1);
+      renderDrinks(); setDirty(true);
+    };
+    wrap.appendChild(row);
+  });
+}
+document.getElementById('add-drink').onclick = () => {
+  if (!content.drinks) content.drinks = [];
+  content.drinks.push({ name: '', size: '', price: '', outOfStock: false });
+  renderDrinks(); setDirty(true);
 };
 
 // ==============================
@@ -2531,6 +2691,249 @@ function exportCSV() {
 }
 
 // ==============================
+// ORDERS — LISTE + STATS + NOTIF SONORE
+// ==============================
+function parsePrice(str) {
+  if (!str) return 0;
+  const m = String(str).replace(',', '.').match(/(\d+(\.\d+)?)/);
+  return m ? parseFloat(m[1]) : 0;
+}
+
+function renderOrderStats() {
+  const total = orders.length;
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const weekAgo = now.getTime() - 7 * 24 * 60 * 60 * 1000;
+  const today = orders.filter(o => o.date && new Date(o.date).getTime() >= startToday).length;
+  const week = orders.filter(o => o.date && new Date(o.date).getTime() >= weekAgo).length;
+  const avg = total > 0
+    ? (orders.reduce((s, o) => s + parsePrice(o.total), 0) / total).toFixed(2).replace('.', ',')
+    : '0';
+  document.getElementById('ord-total').textContent = total;
+  document.getElementById('ord-today').textContent = today;
+  document.getElementById('ord-week').textContent = week;
+  document.getElementById('ord-avg').textContent = avg + ' €';
+}
+
+function renderOrders() {
+  const body = document.getElementById('orders-body');
+  if (!body) return;
+  const countEl = document.getElementById('orders-count');
+  if (countEl) countEl.textContent =
+    `${filteredOrders.length} commande${filteredOrders.length > 1 ? 's' : ''}`;
+
+  if (filteredOrders.length === 0) {
+    body.innerHTML = '<div class="empty-state">Aucune commande pour l\'instant. Les commandes WhatsApp arriveront ici.</div>';
+    return;
+  }
+
+  let html = `
+    <table class="clients-table">
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Date / heure</th>
+          <th>Client</th>
+          <th>Téléphone</th>
+          <th>Détail</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  // Tri par date desc (plus récent en haut)
+  const sorted = [...filteredOrders].sort((a, b) =>
+    new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
+  );
+  sorted.forEach(o => {
+    const d = o.date ? new Date(o.date) : null;
+    const dateStr = d
+      ? d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
+      : '—';
+    html += `
+      <tr>
+        <td><span class="num-badge">#${escapeHtml(o.num || '?')}</span></td>
+        <td><span style="font-family:'Bebas Neue',sans-serif;color:var(--gold-readable);font-size:14px;">${escapeHtml(dateStr)}</span></td>
+        <td><strong>${escapeHtml(o.name || '—')}</strong></td>
+        <td>${escapeHtml(o.phone || '—')}</td>
+        <td style="max-width:300px;color:var(--text-dim);font-size:13px;font-style:italic;">${escapeHtml(o.items || '—')}</td>
+        <td><strong style="color:var(--gold-readable);font-family:'Bebas Neue',sans-serif;font-size:16px;">${escapeHtml(o.total || '—')}</strong></td>
+        <td><button class="btn btn-danger" onclick="deleteOrder('${escapeHtml(o.num || '')}')">Suppr</button></td>
+      </tr>
+    `;
+  });
+  html += '</tbody></table>';
+  body.innerHTML = html;
+}
+
+// Recherche commandes
+document.getElementById('orders-search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  if (!q) {
+    filteredOrders = orders;
+  } else {
+    filteredOrders = orders.filter(o =>
+      (o.name || '').toLowerCase().includes(q) ||
+      (o.phone || '').includes(q) ||
+      (o.items || '').toLowerCase().includes(q) ||
+      String(o.num || '').includes(q)
+    );
+  }
+  renderOrders();
+});
+
+async function deleteOrder(num) {
+  if (!confirm('Supprimer définitivement cette commande ?')) return;
+  orders = orders.filter(o => String(o.num) !== String(num));
+  filteredOrders = filteredOrders.filter(o => String(o.num) !== String(num));
+  try {
+    if (typeof OSTEPH !== 'undefined' && OSTEPH.pushOrders) {
+      await OSTEPH.pushOrders(orders);
+    }
+    toast('Commande supprimée', 'success');
+  } catch (e) {
+    toast('Erreur : ' + e.message, 'error');
+  }
+  renderOrderStats();
+  renderOrders();
+  updateOrdersBadge();
+}
+
+function exportOrdersCSV() {
+  if (!orders.length) {
+    toast('Aucune commande à exporter', 'info');
+    return;
+  }
+  const headers = ['N°', 'Date', 'Heure', 'Client', 'Téléphone', 'Détail commande', 'Total'];
+  const rows = orders.map(o => {
+    const d = o.date ? new Date(o.date) : null;
+    return [
+      o.num || '',
+      d ? d.toLocaleDateString('fr-FR') : '',
+      d ? d.toLocaleTimeString('fr-FR') : '',
+      o.name || '',
+      o.phone || '',
+      o.items || '',
+      o.total || ''
+    ];
+  });
+  const csv = [headers, ...rows].map(r =>
+    r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `osteph_commandes_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`${orders.length} commandes exportées`, 'success');
+}
+
+function updateOrdersBadge() {
+  const badge = document.getElementById('orders-badge');
+  if (!badge) return;
+  // Compte des commandes "non vues" — on stocke le dernier num vu en localStorage
+  const seenNum = localStorage.getItem('osteph_last_order_seen') || '';
+  const unseen = orders.filter(o => String(o.num) > String(seenNum)).length;
+  if (unseen > 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = unseen;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ==============================
+// NOTIF SONORE quand nouvelle commande
+// ==============================
+function playOrderBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // 3 bips successifs
+    [0, 0.25, 0.5].forEach((delay, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 800 + i * 200; // bip qui monte
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + 0.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.2);
+    });
+  } catch (e) {
+    // Audio bloqué (autoplay policy) — pas grave
+  }
+}
+
+function flashTitle() {
+  // Fait clignoter le <title> dans l'onglet du navigateur
+  const original = document.title;
+  let count = 0;
+  const interval = setInterval(() => {
+    document.title = count % 2 === 0 ? '🔔 NOUVELLE COMMANDE !' : original;
+    count++;
+    if (count > 10) {
+      clearInterval(interval);
+      document.title = original;
+    }
+  }, 800);
+}
+
+async function pollOrders() {
+  try {
+    if (typeof OSTEPH === 'undefined' || !OSTEPH.fetchOrders) return;
+    const fresh = await OSTEPH.fetchOrders(true); // force refresh
+    if (!Array.isArray(fresh)) return;
+    const previousCount = orders.length;
+    orders = fresh;
+    // Si la vue filtre commandes est vide ou pas filtrée, refresh
+    const searchInput = document.getElementById('orders-search');
+    const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    if (!q) {
+      filteredOrders = orders;
+    } else {
+      filteredOrders = orders.filter(o =>
+        (o.name || '').toLowerCase().includes(q) ||
+        (o.phone || '').includes(q) ||
+        (o.items || '').toLowerCase().includes(q)
+      );
+    }
+    renderOrderStats();
+    renderOrders();
+    updateOrdersBadge();
+
+    // NOUVELLE COMMANDE détectée
+    if (orders.length > previousCount && previousCount > 0) {
+      const diff = orders.length - previousCount;
+      playOrderBeep();
+      flashTitle();
+      toast(`🔔 ${diff} nouvelle${diff > 1 ? 's' : ''} commande${diff > 1 ? 's' : ''} reçue${diff > 1 ? 's' : ''} !`, 'success');
+    }
+  } catch (e) {
+    console.warn('pollOrders failed:', e);
+  }
+}
+
+function startOrdersPolling() {
+  if (ordersPollInterval) clearInterval(ordersPollInterval);
+  // Poll toutes les 15 secondes
+  ordersPollInterval = setInterval(pollOrders, 15000);
+}
+
+// Quand on visite la vue Orders, on marque tout comme vu
+function markOrdersSeen() {
+  if (orders.length === 0) return;
+  const maxNum = orders.reduce((m, o) => String(o.num) > String(m) ? String(o.num) : m, '');
+  if (maxNum) localStorage.setItem('osteph_last_order_seen', maxNum);
+  updateOrdersBadge();
+}
+
+// ==============================
 // GLOBAL SEARCH
 // ==============================
 document.getElementById('global-search').addEventListener('input', e => {
@@ -2569,15 +2972,79 @@ async function bootApp() {
     content.sauces = content.sauces || [];
     content.extras = content.extras || [];
     content.formulas = content.formulas || [];
+    content.drinks = content.drinks || [];
     content.schedule = content.schedule || [];
     content.settings = content.settings || (OSTEPH._defaultSettings ? OSTEPH._defaultSettings() : {});
+
+    // Pré-remplissage automatique si vide (premier chargement par la cliente)
+    let preFilled = false;
+    if (content.sauces.length === 0) {
+      content.sauces = [
+        { name: 'Algérienne', price: '', outOfStock: false },
+        { name: 'Samouraï', price: '', outOfStock: false },
+        { name: 'Blanche', price: '', outOfStock: false },
+        { name: 'Andalouse', price: '', outOfStock: false },
+        { name: 'Harissa', price: '', outOfStock: false },
+        { name: 'Curry', price: '', outOfStock: false },
+        { name: 'Barbecue', price: '', outOfStock: false },
+        { name: 'Biggy Burger', price: '', outOfStock: false },
+        { name: 'Ketchup', price: '', outOfStock: false },
+        { name: 'Mayonnaise', price: '', outOfStock: false },
+        { name: 'Moutarde', price: '', outOfStock: false },
+        { name: 'Sauce blanche maison', price: '', outOfStock: false }
+      ];
+      preFilled = true;
+    }
+    if (content.extras.length === 0) {
+      content.extras = [
+        { name: 'Cheddar fondu', price: '1,00 €', outOfStock: false },
+        { name: 'Double viande', price: '3,00 €', outOfStock: false },
+        { name: 'Œuf', price: '1,00 €', outOfStock: false },
+        { name: 'Oignons frits', price: '0,50 €', outOfStock: false },
+        { name: 'Bacon', price: '1,50 €', outOfStock: false },
+        { name: 'Raclette', price: '2,00 €', outOfStock: false },
+        { name: 'Supplément frites', price: '2,50 €', outOfStock: false },
+        { name: 'Supplément salade', price: '1,00 €', outOfStock: false }
+      ];
+      preFilled = true;
+    }
+    if (content.drinks.length === 0) {
+      content.drinks = [
+        { name: 'Coca-Cola', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Coca-Cola Zéro', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Fanta Orange', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Sprite', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Ice Tea', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Orangina', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Oasis Tropical', size: '33cl', price: '2,00 €', outOfStock: false },
+        { name: 'Eau plate', size: '50cl', price: '1,50 €', outOfStock: false },
+        { name: 'Eau gazeuse Perrier', size: '33cl', price: '2,00 €', outOfStock: false }
+      ];
+      preFilled = true;
+    }
+    if (content.formulas.length === 0) {
+      content.formulas = [
+        { name: "Menu O'Class", composition: "Shawarma O'Class + Frites + Boisson 33cl", price: '12,00 €' },
+        { name: "Menu O'Cheese", composition: "Shawarma O'Cheese + Frites + Boisson 33cl", price: '13,00 €' },
+        { name: "Menu O'Gyros", composition: "Gyros au choix + Frites + Boisson 33cl", price: '12,50 €' }
+      ];
+      preFilled = true;
+    }
+
     renderCities();
     renderMenu();
     renderSauces();
     renderExtras();
     renderFormulas();
+    renderDrinks();
     renderSchedule();
     renderSettings();
+
+    // Si on a pré-rempli, on signale à la cliente qu'elle doit enregistrer
+    if (preFilled) {
+      setDirty(true);
+      toast('Sauces, suppléments, boissons et formules pré-remplis. Vérifie puis enregistre dans le cloud.', 'info');
+    }
   } catch (err) {
     toast('Erreur de chargement contenu : ' + err.message, 'error');
   }
@@ -2598,6 +3065,25 @@ async function bootApp() {
     filteredClients = [];
     renderStats();
     renderClients();
+  }
+
+  // Chargement commandes
+  try {
+    if (typeof OSTEPH !== 'undefined' && OSTEPH.fetchOrders) {
+      orders = await OSTEPH.fetchOrders();
+    } else {
+      orders = [];
+    }
+    filteredOrders = orders;
+    renderOrderStats();
+    renderOrders();
+    updateOrdersBadge();
+    // Démarrer le polling pour notif sonore + clignotement
+    startOrdersPolling();
+  } catch (e) {
+    console.error(e);
+    orders = [];
+    filteredOrders = [];
   }
 }
 
