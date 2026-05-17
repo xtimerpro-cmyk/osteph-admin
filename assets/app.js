@@ -86,7 +86,9 @@ const OSTEPH = {
       tiktok: typeof s.tiktok === 'string' ? s.tiktok : def.tiktok,
       offerTitle: typeof s.offerTitle === 'string' ? s.offerTitle : def.offerTitle,
       offerThreshold: typeof s.offerThreshold === 'number' ? s.offerThreshold : def.offerThreshold,
-      showSakura: typeof s.showSakura === 'boolean' ? s.showSakura : def.showSakura
+      showSakura: typeof s.showSakura === 'boolean' ? s.showSakura : def.showSakura,
+      siteActive: typeof s.siteActive === 'boolean' ? s.siteActive : def.siteActive,
+      killMessage: typeof s.killMessage === 'string' ? s.killMessage : def.killMessage
     };
   },
 
@@ -101,7 +103,9 @@ const OSTEPH = {
       tiktok: 'https://tiktok.com/',
       offerTitle: "1 O'Class ou 1 O'Gyros offert tous les 10 passages",
       offerThreshold: 10,
-      showSakura: true
+      showSakura: true,
+      siteActive: true,
+      killMessage: "Site temporairement indisponible. Pour toute commande, appelez le 06 75 90 91 84"
     };
   },
 

@@ -1277,6 +1277,7 @@
         <a class="sidebar-subitem" data-view="settings-tagline">Slogan</a>
         <a class="sidebar-subitem" data-view="settings-offer">Offre fidélité</a>
         <a class="sidebar-subitem" data-view="settings-animation">Animation</a>
+        <a class="sidebar-subitem" data-view="settings-killswitch">⚠️ Statut du site</a>
       </div>
 
       <div class="sidebar-section">Camion</div>
@@ -1561,6 +1562,46 @@
       </div>
     </section>
 
+    <!-- ====== SETTINGS: KILL SWITCH ====== -->
+    <section class="view" id="view-settings-killswitch">
+      <div class="view-header">
+        <div class="view-title">Statut du site</div>
+        <div class="view-subtitle">Activer ou suspendre l'accès public à osteph.fr</div>
+      </div>
+
+      <div class="card" style="border-color: rgba(248, 113, 113, 0.4); border-left: 3px solid #f87171;">
+        <div class="help-block" style="border-left-color: #f87171;">
+          <strong style="color: #f87171;">⚠️ Zone sensible.</strong>
+          Cette fonctionnalité permet de <strong>couper ou réactiver l'accès au site public</strong> osteph.fr.
+          Lorsque le site est suspendu, les visiteurs voient un écran de maintenance avec le numéro de téléphone.
+          Le back office reste toujours accessible.
+        </div>
+
+        <div class="card-head">
+          <div class="card-title">
+            <span class="ico" id="kill-status-icon">🟢</span>
+            <span id="kill-status-text">Site en ligne</span>
+          </div>
+        </div>
+
+        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px 0;">
+          <input type="checkbox" data-setting="siteActive" id="killswitch-toggle" style="width:24px;height:24px;accent-color:var(--gold);" checked>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:16px;">
+            Site public <strong style="color:#4ade80;">actif</strong> et accessible à tous les visiteurs
+          </span>
+        </label>
+
+        <div class="field" style="margin-top:18px;">
+          <span class="field-label">Message affiché quand le site est suspendu</span>
+          <input class="input" type="text" data-setting="killMessage"
+                 placeholder="Site temporairement indisponible. Pour toute commande, appelez le 06 75 90 91 84">
+          <span class="field-help">
+            Ce texte apparaîtra sur l'écran de maintenance avec le logo et le numéro de téléphone.
+          </span>
+        </div>
+      </div>
+    </section>
+
     <!-- ====== VIEW: QR ====== -->
     <section class="view" id="view-qr">
       <div class="view-header">
@@ -1675,6 +1716,7 @@ const VIEW_TITLES = {
   'settings-tagline': 'Slogan',
   'settings-offer': 'Offre fidélité',
   'settings-animation': 'Animation',
+  'settings-killswitch': 'Statut du site',
   'qr': 'Mode QR kiosque'
 };
 
@@ -1908,12 +1950,33 @@ function renderSettings() {
     const key = input.dataset.setting;
     const val = s[key];
     if (input.type === 'checkbox') {
-      input.checked = !!val;
+      // siteActive est par défaut TRUE si non défini
+      if (key === 'siteActive') {
+        input.checked = val !== false;
+      } else {
+        input.checked = !!val;
+      }
     } else {
       input.value = val == null ? '' : val;
     }
     input.oninput = () => {
       if (!content.settings) content.settings = {};
+
+      // Cas spécial : kill switch → confirmation
+      if (key === 'siteActive' && input.checked === false) {
+        const confirmed = confirm(
+          '⚠️ ATTENTION\n\n' +
+          'Tu vas SUSPENDRE l\'accès public au site osteph.fr.\n\n' +
+          'Tous les visiteurs verront un écran de maintenance avec le numéro de téléphone.\n\n' +
+          'Tu pourras le réactiver à tout moment depuis cette page.\n\n' +
+          'Confirmer la mise hors ligne ?'
+        );
+        if (!confirmed) {
+          input.checked = true;
+          return;
+        }
+      }
+
       if (input.type === 'checkbox') {
         content.settings[key] = input.checked;
       } else if (input.type === 'number') {
@@ -1923,9 +1986,28 @@ function renderSettings() {
         content.settings[key] = input.value;
       }
       setDirty(true);
+      updateKillStatus();
     };
     input.onchange = input.oninput;
   });
+  updateKillStatus();
+}
+
+function updateKillStatus() {
+  const active = content.settings && content.settings.siteActive !== false;
+  const icon = document.getElementById('kill-status-icon');
+  const text = document.getElementById('kill-status-text');
+  if (icon && text) {
+    if (active) {
+      icon.textContent = '🟢';
+      text.textContent = 'Site en ligne';
+      text.style.color = '#4ade80';
+    } else {
+      icon.textContent = '🔴';
+      text.textContent = 'Site suspendu — Visiteurs voient l\'écran de maintenance';
+      text.style.color = '#f87171';
+    }
+  }
 }
 
 // ==============================
