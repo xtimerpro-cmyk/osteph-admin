@@ -979,6 +979,192 @@
     font-weight: 500;
   }
 
+  /* ========================= MENU ITEM ENRICHI ========================= */
+  .menu-item-card {
+    background: rgba(207, 187, 143, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    transition: opacity 0.2s;
+  }
+  .menu-item-card.item-oos {
+    opacity: 0.5;
+    background: rgba(248, 113, 113, 0.05);
+    border-color: rgba(248, 113, 113, 0.3);
+  }
+  .menu-item-card.item-oos input:not([type=checkbox]) {
+    text-decoration: line-through;
+    color: var(--text-faint);
+  }
+  .menu-item-desc {
+    margin-top: 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-dim);
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    width: 100%;
+  }
+  .menu-item-desc:focus {
+    outline: none;
+    background: rgba(0, 0, 0, 0.3);
+    border-color: var(--gold);
+  }
+  .menu-item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .tag-chk {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 3px 8px;
+    background: rgba(207, 187, 143, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+  .tag-chk:hover { color: var(--text); border-color: var(--border-strong); }
+  .tag-chk input[type="checkbox"] {
+    width: 14px; height: 14px;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+  .tag-chk.tag-oos {
+    color: rgba(248, 113, 113, 0.8);
+    border-color: rgba(248, 113, 113, 0.3);
+    background: rgba(248, 113, 113, 0.05);
+  }
+  .tag-chk.tag-oos input[type="checkbox"] {
+    accent-color: var(--red);
+  }
+
+  /* ========================= SAUCES / EXTRAS ========================= */
+  .sauce-row {
+    display: grid;
+    grid-template-columns: 1fr 130px auto 30px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(207, 187, 143, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: opacity 0.2s;
+  }
+  .sauce-row.item-oos {
+    opacity: 0.5;
+    background: rgba(248, 113, 113, 0.05);
+    border-color: rgba(248, 113, 113, 0.3);
+  }
+  .sauce-row.item-oos input[type="text"] {
+    text-decoration: line-through;
+    color: var(--text-faint);
+  }
+  .sauce-row input[type="text"] {
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+  }
+  .sauce-row input[type="text"]:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .sauce-row input.price {
+    text-align: right;
+    color: var(--gold-readable);
+    font-weight: 500;
+  }
+  @media (max-width: 700px) {
+    .sauce-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .sauce-row .tag-chk { grid-column: span 2; justify-content: center; }
+    .sauce-row .btn-remove { grid-column: span 2; justify-self: end; }
+  }
+
+  /* ========================= FORMULAS ========================= */
+  .formula-row {
+    background: linear-gradient(165deg,
+      rgba(207, 187, 143, 0.06) 0%,
+      rgba(207, 187, 143, 0.02) 100%);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .formula-row::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(207, 187, 143, 0.5), transparent);
+  }
+  .formula-head {
+    display: grid;
+    grid-template-columns: 1fr 140px 30px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .formula-head input {
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    width: 100%;
+  }
+  .formula-head input:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .formula-head input.price {
+    text-align: right;
+    color: var(--gold-readable);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+  }
+  .formula-desc {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+  }
+  .formula-desc:focus {
+    outline: none;
+    border-color: var(--gold);
+    color: var(--text);
+  }
+
   /* ========================= SCHEDULE ========================= */
   .schedule-row {
     display: grid;
@@ -1255,7 +1441,10 @@
       </div>
       <div class="sidebar-submenu" id="submenu-content">
         <a class="sidebar-subitem" data-view="cities">Villes (ticker)</a>
-        <a class="sidebar-subitem" data-view="menu">Menu</a>
+        <a class="sidebar-subitem" data-view="menu">Menu (plats)</a>
+        <a class="sidebar-subitem" data-view="sauces">Sauces</a>
+        <a class="sidebar-subitem" data-view="extras">Suppléments</a>
+        <a class="sidebar-subitem" data-view="formulas">Formules</a>
         <a class="sidebar-subitem" data-view="schedule">Planning & Carte</a>
       </div>
 
@@ -1406,15 +1595,79 @@
     <!-- ====== VIEW: MENU ====== -->
     <section class="view" id="view-menu">
       <div class="view-header">
-        <div class="view-title">Menu</div>
-        <div class="view-subtitle">Plats et prix affichés sur la page Menu</div>
+        <div class="view-title">Menu — Plats</div>
+        <div class="view-subtitle">Sections avec plats, descriptions, prix, tags et rupture de stock</div>
       </div>
       <div class="help-block">
-        Organise le menu par sections (Shawarma, Gyros, Boissons, etc.). Pour chaque plat indique son
-        <strong>nom</strong> et son <strong>prix</strong> (avec le symbole €).
+        Organise le menu par sections (Shawarma, Gyros, Tacos, Burgers, etc.). Pour chaque plat tu peux ajouter :
+        <strong>nom</strong>, <strong>prix</strong>, <strong>description courte</strong> (ingrédients),
+        des <strong>tags</strong> (🌶️ piquant, 🥬 végé, ⭐ best-seller) et marquer <strong>"en rupture"</strong>
+        temporairement quand t'es à court d'un ingrédient.<br>
+        💡 Pour les <strong>sauces</strong>, <strong>suppléments</strong> et <strong>formules</strong>, va dans les autres onglets dédiés.
       </div>
       <div id="menu-list"></div>
       <button class="btn-add" id="add-section">+ Ajouter une section</button>
+    </section>
+
+    <!-- ====== VIEW: SAUCES ====== -->
+    <section class="view" id="view-sauces">
+      <div class="view-header">
+        <div class="view-title">Sauces</div>
+        <div class="view-subtitle">Liste des sauces proposées au choix avec les plats</div>
+      </div>
+      <div class="help-block">
+        Liste toutes les <strong>sauces disponibles</strong> au camion : <i>Algérienne, Samouraï, Blanche,
+        Andalouse, Harissa, Curry, BBQ, Ketchup, Mayo, Moutarde, Yaourt, etc.</i><br>
+        Si une sauce est <strong>payante</strong>, indique son prix (laissé vide = sauce gratuite).
+        Tu peux aussi marquer une sauce comme <strong>en rupture</strong> pour la cacher temporairement.
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="ico">🥫</span> Sauces disponibles</div>
+        </div>
+        <div id="sauces-list"></div>
+        <button class="btn-add" id="add-sauce">+ Ajouter une sauce</button>
+      </div>
+    </section>
+
+    <!-- ====== VIEW: EXTRAS (suppléments) ====== -->
+    <section class="view" id="view-extras">
+      <div class="view-header">
+        <div class="view-title">Suppléments</div>
+        <div class="view-subtitle">Extras facturés en plus des plats</div>
+      </div>
+      <div class="help-block">
+        Liste tous les <strong>suppléments payants</strong> : <i>cheddar, double viande, œuf, oignons frits,
+        bacon, supplément frites, raclette, etc.</i><br>
+        Chaque supplément a un <strong>nom</strong> et un <strong>prix</strong>. Tu peux les marquer en rupture.
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="ico">➕</span> Suppléments</div>
+        </div>
+        <div id="extras-list"></div>
+        <button class="btn-add" id="add-extra">+ Ajouter un supplément</button>
+      </div>
+    </section>
+
+    <!-- ====== VIEW: FORMULAS ====== -->
+    <section class="view" id="view-formulas">
+      <div class="view-header">
+        <div class="view-title">Formules & Menus</div>
+        <div class="view-subtitle">Packs combinés à prix avantageux</div>
+      </div>
+      <div class="help-block">
+        Crée des <strong>formules combinées</strong> : ex. "Menu O'Class = Shawarma + Frites + Boisson 12€".
+        Pour chaque formule : <strong>nom</strong>, <strong>composition</strong> (texte libre) et <strong>prix</strong>.<br>
+        💡 Mets en avant les formules best-sellers en haut de la liste.
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="ico">🍽️</span> Formules</div>
+        </div>
+        <div id="formulas-list"></div>
+        <button class="btn-add" id="add-formula">+ Ajouter une formule</button>
+      </div>
     </section>
 
     <!-- ====== VIEW: SCHEDULE ====== -->
@@ -1708,7 +1961,10 @@ document.querySelectorAll('.sidebar-item[data-toggle]').forEach(el => {
 const VIEW_TITLES = {
   'home': 'Tableau de bord',
   'cities': 'Villes (ticker)',
-  'menu': 'Menu',
+  'menu': 'Menu — Plats',
+  'sauces': 'Sauces',
+  'extras': 'Suppléments',
+  'formulas': 'Formules & Menus',
   'schedule': 'Planning & Carte',
   'clients': 'Programme fidélité',
   'settings-phone': 'Téléphone',
@@ -1737,7 +1993,7 @@ function navigate(view) {
   if (view.startsWith('settings-')) {
     document.getElementById('submenu-settings').classList.add('open');
     document.querySelector('[data-toggle="settings"]').classList.add('open');
-  } else if (['cities','menu','schedule'].includes(view)) {
+  } else if (['cities','menu','sauces','extras','formulas','schedule'].includes(view)) {
     document.getElementById('submenu-content').classList.add('open');
     document.querySelector('[data-toggle="content"]').classList.add('open');
   }
@@ -1842,7 +2098,7 @@ document.getElementById('add-city').onclick = () => {
 };
 
 // ==============================
-// RENDER: MENU
+// RENDER: MENU (plats avec description, tags, rupture)
 // ==============================
 function renderMenu() {
   const wrap = document.getElementById('menu-list');
@@ -1869,13 +2125,24 @@ function renderMenu() {
     const itemsDiv = sectDiv.querySelector('.menu-items');
     (section.items || []).forEach((item, ii) => {
       const row = document.createElement('div');
-      row.className = 'menu-item-row';
+      row.className = 'menu-item-card';
+      const tags = item.tags || {};
       row.innerHTML = `
-        <input type="text" value="${escapeHtml(item.name || '')}" placeholder="Nom du plat">
-        <input type="text" class="price" value="${escapeHtml(item.price || '')}" placeholder="Prix (ex: 9,50 €)">
-        <button class="btn-remove" title="Supprimer">×</button>
+        <div class="menu-item-row">
+          <input type="text" value="${escapeHtml(item.name || '')}" placeholder="Nom du plat">
+          <input type="text" class="price" value="${escapeHtml(item.price || '')}" placeholder="Prix (9,50 €)">
+          <button class="btn-remove" title="Supprimer">×</button>
+        </div>
+        <input type="text" class="menu-item-desc" value="${escapeHtml(item.description || '')}" placeholder="Description (ex: viande de bœuf, salade, tomates, oignons)">
+        <div class="menu-item-tags">
+          <label class="tag-chk"><input type="checkbox" data-tag="spicy" ${tags.spicy ? 'checked' : ''}> 🌶️ Piquant</label>
+          <label class="tag-chk"><input type="checkbox" data-tag="veggie" ${tags.veggie ? 'checked' : ''}> 🥬 Végé</label>
+          <label class="tag-chk"><input type="checkbox" data-tag="bestseller" ${tags.bestseller ? 'checked' : ''}> ⭐ Best-seller</label>
+          <label class="tag-chk"><input type="checkbox" data-tag="new" ${tags.new ? 'checked' : ''}> ✨ Nouveau</label>
+          <label class="tag-chk tag-oos"><input type="checkbox" data-out-of-stock ${item.outOfStock ? 'checked' : ''}> 🚫 En rupture</label>
+        </div>
       `;
-      const inputs = row.querySelectorAll('input');
+      const inputs = row.querySelectorAll('.menu-item-row input');
       inputs[0].oninput = e => { item.name = e.target.value; setDirty(true); };
       inputs[1].oninput = e => { item.price = e.target.value; setDirty(true); };
       row.querySelector('.btn-remove').onclick = () => {
@@ -1883,12 +2150,30 @@ function renderMenu() {
         renderMenu();
         setDirty(true);
       };
+      row.querySelector('.menu-item-desc').oninput = e => { item.description = e.target.value; setDirty(true); };
+      // Tags
+      row.querySelectorAll('[data-tag]').forEach(chk => {
+        chk.onchange = () => {
+          if (!item.tags) item.tags = {};
+          item.tags[chk.dataset.tag] = chk.checked;
+          setDirty(true);
+        };
+      });
+      // Rupture
+      const oosChk = row.querySelector('[data-out-of-stock]');
+      oosChk.onchange = () => {
+        item.outOfStock = oosChk.checked;
+        row.classList.toggle('item-oos', oosChk.checked);
+        setDirty(true);
+      };
+      if (item.outOfStock) row.classList.add('item-oos');
+
       itemsDiv.appendChild(row);
     });
 
     sectDiv.querySelector('.add-item').onclick = () => {
       if (!section.items) section.items = [];
-      section.items.push({ name: '', price: '' });
+      section.items.push({ name: '', price: '', description: '', tags: {}, outOfStock: false });
       renderMenu();
       setDirty(true);
     };
@@ -1901,6 +2186,117 @@ document.getElementById('add-section').onclick = () => {
   content.menu.push({ title: '', items: [] });
   renderMenu();
   setDirty(true);
+};
+
+// ==============================
+// RENDER: SAUCES
+// ==============================
+function renderSauces() {
+  const wrap = document.getElementById('sauces-list');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  (content.sauces || []).forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'sauce-row';
+    if (s.outOfStock) row.classList.add('item-oos');
+    row.innerHTML = `
+      <input type="text" value="${escapeHtml(s.name || '')}" placeholder="Nom de la sauce (ex: Algérienne)">
+      <input type="text" class="price" value="${escapeHtml(s.price || '')}" placeholder="Prix (vide = gratuit)">
+      <label class="tag-chk tag-oos"><input type="checkbox" ${s.outOfStock ? 'checked' : ''}> 🚫 Rupture</label>
+      <button class="btn-remove" title="Supprimer">×</button>
+    `;
+    const inputs = row.querySelectorAll('input');
+    inputs[0].oninput = e => { s.name = e.target.value; setDirty(true); };
+    inputs[1].oninput = e => { s.price = e.target.value; setDirty(true); };
+    inputs[2].onchange = e => {
+      s.outOfStock = e.target.checked;
+      row.classList.toggle('item-oos', e.target.checked);
+      setDirty(true);
+    };
+    row.querySelector('.btn-remove').onclick = () => {
+      content.sauces.splice(i, 1);
+      renderSauces(); setDirty(true);
+    };
+    wrap.appendChild(row);
+  });
+}
+document.getElementById('add-sauce').onclick = () => {
+  if (!content.sauces) content.sauces = [];
+  content.sauces.push({ name: '', price: '', outOfStock: false });
+  renderSauces(); setDirty(true);
+};
+
+// ==============================
+// RENDER: EXTRAS (suppléments)
+// ==============================
+function renderExtras() {
+  const wrap = document.getElementById('extras-list');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  (content.extras || []).forEach((x, i) => {
+    const row = document.createElement('div');
+    row.className = 'sauce-row';
+    if (x.outOfStock) row.classList.add('item-oos');
+    row.innerHTML = `
+      <input type="text" value="${escapeHtml(x.name || '')}" placeholder="Nom du supplément (ex: Double viande)">
+      <input type="text" class="price" value="${escapeHtml(x.price || '')}" placeholder="Prix (ex: 2,50 €)">
+      <label class="tag-chk tag-oos"><input type="checkbox" ${x.outOfStock ? 'checked' : ''}> 🚫 Rupture</label>
+      <button class="btn-remove" title="Supprimer">×</button>
+    `;
+    const inputs = row.querySelectorAll('input');
+    inputs[0].oninput = e => { x.name = e.target.value; setDirty(true); };
+    inputs[1].oninput = e => { x.price = e.target.value; setDirty(true); };
+    inputs[2].onchange = e => {
+      x.outOfStock = e.target.checked;
+      row.classList.toggle('item-oos', e.target.checked);
+      setDirty(true);
+    };
+    row.querySelector('.btn-remove').onclick = () => {
+      content.extras.splice(i, 1);
+      renderExtras(); setDirty(true);
+    };
+    wrap.appendChild(row);
+  });
+}
+document.getElementById('add-extra').onclick = () => {
+  if (!content.extras) content.extras = [];
+  content.extras.push({ name: '', price: '', outOfStock: false });
+  renderExtras(); setDirty(true);
+};
+
+// ==============================
+// RENDER: FORMULAS
+// ==============================
+function renderFormulas() {
+  const wrap = document.getElementById('formulas-list');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  (content.formulas || []).forEach((f, i) => {
+    const row = document.createElement('div');
+    row.className = 'formula-row';
+    row.innerHTML = `
+      <div class="formula-head">
+        <input type="text" value="${escapeHtml(f.name || '')}" placeholder="Nom de la formule (ex: Menu O'Class)">
+        <input type="text" class="price" value="${escapeHtml(f.price || '')}" placeholder="Prix (12,00 €)">
+        <button class="btn-remove" title="Supprimer">×</button>
+      </div>
+      <input type="text" class="formula-desc" value="${escapeHtml(f.composition || '')}" placeholder="Composition (ex: Shawarma + Frites + Boisson 33cl)">
+    `;
+    const inputs = row.querySelectorAll('input');
+    inputs[0].oninput = e => { f.name = e.target.value; setDirty(true); };
+    inputs[1].oninput = e => { f.price = e.target.value; setDirty(true); };
+    inputs[2].oninput = e => { f.composition = e.target.value; setDirty(true); };
+    row.querySelector('.btn-remove').onclick = () => {
+      content.formulas.splice(i, 1);
+      renderFormulas(); setDirty(true);
+    };
+    wrap.appendChild(row);
+  });
+}
+document.getElementById('add-formula').onclick = () => {
+  if (!content.formulas) content.formulas = [];
+  content.formulas.push({ name: '', composition: '', price: '' });
+  renderFormulas(); setDirty(true);
 };
 
 // ==============================
@@ -2170,10 +2566,16 @@ async function bootApp() {
     content = await OSTEPH.fetchContent(true);
     content.cities = content.cities || [];
     content.menu = content.menu || [];
+    content.sauces = content.sauces || [];
+    content.extras = content.extras || [];
+    content.formulas = content.formulas || [];
     content.schedule = content.schedule || [];
     content.settings = content.settings || (OSTEPH._defaultSettings ? OSTEPH._defaultSettings() : {});
     renderCities();
     renderMenu();
+    renderSauces();
+    renderExtras();
+    renderFormulas();
     renderSchedule();
     renderSettings();
   } catch (err) {
